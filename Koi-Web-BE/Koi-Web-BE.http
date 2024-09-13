@@ -1,0 +1,6 @@
+@Koi_Web_BE_HostAddress = http://localhost:5107
+
+GET {{Koi_Web_BE_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
