@@ -1,5 +1,5 @@
 using Koi_Web_BE.Endpoints.Internal;
-using Koi_Web_BE.Models;
+using Koi_Web_BE.Models.Primitives;
 using Koi_Web_BE.UseCases.Test.Queries;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -12,7 +12,7 @@ public class TestEndpoints : IEndpoints
     {
         app.MapGet("/api/test", TestHandler);
     }
-    
+
     private static async Task<IResult> TestHandler([FromServices] ISender sender)
     {
         var command = new Test.Query();

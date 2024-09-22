@@ -1,4 +1,4 @@
-﻿namespace Koi_Web_BE.Models;
+﻿namespace Koi_Web_BE.Models.Primitives;
 
 public record Result<T>
 {
