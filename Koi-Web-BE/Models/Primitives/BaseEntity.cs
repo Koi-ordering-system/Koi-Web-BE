@@ -1,14 +1,13 @@
 using System.ComponentModel.DataAnnotations.Schema;
-using Koi_Web_BE.Models.Primitives;
 
-namespace Koi_Web_BE.Models.Entities;
+namespace Koi_Web_BE.Models.Primitives;
 
 public class BaseEntity
 {
     public virtual Guid Id { get; set; } = Guid.NewGuid();
     public DateTimeOffset CreatedAt { get; set; } = DateTimeOffset.UtcNow;
-    public DateTimeOffset? UpdatedAt { get; set; }
-    public DateTimeOffset? DeletedAt { get; set; }
+    public DateTimeOffset? UpdatedAt { get; set; } = null!;
+    public DateTimeOffset? DeletedAt { get; set; } = null!;
     public bool IsDeleted { get; set; } = false;
 
     public void Delete() => DeletedAt = DateTimeOffset.UtcNow;

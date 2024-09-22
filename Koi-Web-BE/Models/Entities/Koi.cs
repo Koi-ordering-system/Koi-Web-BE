@@ -1,3 +1,6 @@
+using System.ComponentModel.DataAnnotations.Schema;
+using Koi_Web_BE.Models.Primitives;
+
 namespace Koi_Web_BE.Models.Entities;
 
 public class Koi : BaseEntity
@@ -9,4 +12,9 @@ public class Koi : BaseEntity
     public decimal MaxSize { get; set; } = 0;
     public bool IsMale { get; set; } = true;
     public decimal Price { get; set; } = 0;
+    // Relations
+    [ForeignKey(nameof(SpeciesId))]
+    public Species Species { get; set; } = null!;
+    public IList<KoiImage> Images { get; set; } = [];
+    public IList<OrderKoi> OrderKois { get; set; } = [];
 }
