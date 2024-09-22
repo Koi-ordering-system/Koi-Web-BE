@@ -16,7 +16,7 @@ public static class EndpointExtensions
         foreach (var endpointType in endpointTypes)
         {
             endpointType.GetMethod(nameof(IEndpoints.DefineEndpoints))!
-                .Invoke(null, new object[] { app });
+                .Invoke(null, [app]);
         }
     }
 

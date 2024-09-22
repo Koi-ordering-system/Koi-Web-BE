@@ -1,6 +1,6 @@
 ﻿using System.Text.Json;
 using Koi_Web_BE.Exceptions;
-using Koi_Web_BE.Models;
+using Koi_Web_BE.Models.Primitives;
 
 namespace Koi_Web_BE.Middlewares;
 
@@ -17,7 +17,7 @@ public class ExceptionMiddleware : IMiddleware
             await HandleExceptionAsync(context, ex);
         }
     }
-    
+
     private readonly IDictionary<Type, Action<HttpContext, Exception>> _exceptionHandlers = new Dictionary<Type, Action<HttpContext, Exception>>
     {
         // Note: Handle every exception you throw here
@@ -64,19 +64,19 @@ public class ExceptionMiddleware : IMiddleware
             handler.Invoke(context, ex);
             return Task.CompletedTask;
         }
-        
+
         context.Response.StatusCode = StatusCodes.Status500InternalServerError;
         Console.WriteLine(ex.ToString());
         return Task.CompletedTask;
     }
 
-    
+
     private static async void HandleNotFoundException(HttpContext context, Exception ex)
     {
         context.Response.StatusCode = StatusCodes.Status404NotFound;
         await WriteExceptionMessageAsync(context, ex);
     }
-    
+
     private static async void HandleConflictException(HttpContext context, Exception ex)
     {
         context.Response.StatusCode = StatusCodes.Status409Conflict;
@@ -108,7 +108,7 @@ public class ExceptionMiddleware : IMiddleware
         context.Response.StatusCode = StatusCodes.Status400BadRequest;
         await WriteExceptionMessageAsync(context, ex);
     }
-    
+
     private static async void HandleBadHttpRequestException(HttpContext context, Exception _)
     {
         context.Response.StatusCode = StatusCodes.Status400BadRequest;
