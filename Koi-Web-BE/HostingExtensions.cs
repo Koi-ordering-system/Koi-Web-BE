@@ -2,6 +2,7 @@
 using FluentValidation;
 using Koi_Web_BE.Behaviors;
 using Koi_Web_BE.Database;
+using Koi_Web_BE.Database.Interceptors;
 using Koi_Web_BE.Middlewares;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -33,6 +34,9 @@ public static class HostingExtensions
         
         var connectionString = configuration.GetConnectionString("DefaultConnection")
                                ?? throw new InvalidOperationException("DefaultConnection are missing");
+        
+        builder.Services.AddScoped<ISaveChangesInterceptor, DispatchDomainEventsInterceptor>();
+        builder.Services.AddScoped<ISaveChangesInterceptor, UpdateAuditableInterceptor>();
         builder.Services.AddDbContext<ApplicationDbContext>((sp, options) =>
         {
             options.AddInterceptors(sp.GetServices<ISaveChangesInterceptor>());
