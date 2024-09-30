@@ -10,7 +10,7 @@ public class DeleteSpeciesEndpointHandler
     {
         Result<DeleteSpecies.Response> result = await sender.Send(new DeleteSpecies.Command(id), cancellationToken);
         if (!result.Succeeded)
-            return Results.BadRequest(result.Message);
+            return Results.BadRequest(result);
         return Results.NoContent();
     }
 }

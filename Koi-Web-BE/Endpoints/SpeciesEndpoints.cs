@@ -8,6 +8,9 @@ public static class SpeciesEndpoints
     public static RouteGroupBuilder DefineSpeciesEndpoints(this RouteGroupBuilder app)
     {
         // GET
+        app.MapGet("{id}", GetSpeciesByIdEndpointHandler.Handle)
+            .WithMetadata(new SwaggerOperationAttribute("Get a Species"))
+            .RequireAuthorization();
         // POST
         app.MapPost("", CreateSpeciesEndpointHandler.Handle)
             .WithMetadata(new SwaggerOperationAttribute("Create a Species"))
