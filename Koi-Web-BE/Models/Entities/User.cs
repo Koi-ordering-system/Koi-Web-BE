@@ -14,7 +14,7 @@ public class User : BaseEntity
     // Relations
     public IList<Farm> Farms { get; set; } = [];
     public IList<Order> Orders { get; set; } = [];
-    public IList<Cart> Carts { get; set; } = [];
+    public Cart Carts { get; set; } = null!;
     public IList<Koi> Kois { get; set; } = [];
     public IList<Review> Reviews { get; set; } = [];
     public IList<OrderKoi> OrderKois { get; set; } = [];
