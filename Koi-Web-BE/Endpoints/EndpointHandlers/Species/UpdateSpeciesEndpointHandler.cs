@@ -10,7 +10,7 @@ public class UpdateSpeciesEndpointHandler
     {
         Result<UpdateSpecies.Response> result = await sender.Send(new UpdateSpecies.Command(id, name), cancellationToken);
         if (!result.Succeeded)
-            return Results.BadRequest(result.Message);
+            return Results.BadRequest(result);
         return Results.NoContent();
     }
 }

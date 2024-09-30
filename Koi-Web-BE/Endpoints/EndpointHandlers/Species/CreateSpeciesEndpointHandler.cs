@@ -10,7 +10,7 @@ public class CreateSpeciesEndpointHandler
     {
         Result<Response> result = await sender.Send(new Command(Name: name), cancellationToken);
         if (!result.Succeeded)
-            return Results.BadRequest(result.Message);
+            return Results.BadRequest(result);
         return Results.Created("", result);
     }
 }
