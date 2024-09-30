@@ -11,6 +11,9 @@ public static class SpeciesEndpoints
         app.MapGet("{id}", GetSpeciesByIdEndpointHandler.Handle)
             .WithMetadata(new SwaggerOperationAttribute("Get a Species"))
             .RequireAuthorization();
+        app.MapGet("", GetSpeciesEndpointHandler.Handle)
+            .WithMetadata(new SwaggerOperationAttribute("Get all Species"))
+            .RequireAuthorization();
         // POST
         app.MapPost("", CreateSpeciesEndpointHandler.Handle)
             .WithMetadata(new SwaggerOperationAttribute("Create a Species"))
