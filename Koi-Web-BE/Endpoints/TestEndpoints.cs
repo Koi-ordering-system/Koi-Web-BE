@@ -1,7 +1,6 @@
 using Koi_Web_BE.Endpoints.Internal;
 using Koi_Web_BE.Models.Primitives;
 using Koi_Web_BE.UseCases.Test.Queries;
-using Koi_Web_BE.UseCases.UC_Species.Command;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -11,8 +10,9 @@ public class TestEndpoints : IEndpoints
 {
     public static void DefineEndpoints(IEndpointRouteBuilder app)
     {
+        // GET
         app.MapGet("/api/test", TestHandler);
-        app.MapDelete("/users/{Id}", DeleteSpecies);
+        app.MapGroup("api/species").DefineSpeciesEndpoints().WithTags("Species");
     }
 
     private static async Task<IResult> TestHandler([FromServices] ISender sender)
@@ -20,10 +20,5 @@ public class TestEndpoints : IEndpoints
         var command = new Test.Query();
         var result = await sender.Send(command);
         return Results.Ok(Result<Test.Response>.Succeed(result));
-    }
-    private static async Task<IResult> DeleteSpecies(ISender sender, Guid Id)
-    {
-        var result = await sender.Send(new DeleteSpecies.Command(Id));
-        return Results.Ok(result);
     }
 }
