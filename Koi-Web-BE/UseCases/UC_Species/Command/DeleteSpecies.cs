@@ -9,17 +9,19 @@ namespace Koi_Web_BE.UseCases.UC_Species.Command;
 
 public class DeleteSpecies
 {
-    public record Command(Guid Id) : IRequest<Result<DeleteSpecies>>;
+    public record Command(Guid Id) : IRequest<Result<Response>>;
 
-    public class Handler(IApplicationDbContext context) : IRequestHandler<Command, Result<DeleteSpecies>>
+    public record Response();
+
+    public class Handler(IApplicationDbContext context) : IRequestHandler<Command, Result<Response>>
     {
-        public async Task<Result<DeleteSpecies>> Handle(Command request, CancellationToken cancellationToken)
+        public async Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)
         {
             Species? deletingSpecies = await context.Species.SingleOrDefaultAsync(s => s.Id.Equals(request.Id), cancellationToken);
-            if (deletingSpecies is null) return Result<DeleteSpecies>.Fail(new NotFoundException("Species not found"));
+            if (deletingSpecies is null) return Result<Response>.Fail(new NotFoundException("Species not found"));
             context.Species.Remove(deletingSpecies);
             await context.SaveChangesAsync(cancellationToken);
-            return Result<DeleteSpecies>.Succeed(null!);
+            return Result<Response>.Succeed(new Response());
         }
     }
 }

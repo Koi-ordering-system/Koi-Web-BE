@@ -1,10 +1,9 @@
 using Koi_Web_BE.Models.Entities;
-using MediatR;
 using Microsoft.EntityFrameworkCore;
 
 namespace Koi_Web_BE.Database;
 
-public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options, IMediator mediator) : DbContext(options), IApplicationDbContext
+public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : DbContext(options), IApplicationDbContext
 {
     public DbSet<Cart> Carts => Set<Cart>();
     public DbSet<CartItem> CartItems => Set<CartItem>();
