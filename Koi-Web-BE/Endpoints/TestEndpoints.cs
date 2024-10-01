@@ -13,6 +13,7 @@ public class TestEndpoints : IEndpoints
         // GET
         app.MapGet("/api/test", TestHandler);
         app.MapGroup("api/species").DefineSpeciesEndpoints().WithTags("Species");
+        app.MapGroup("api/orders").DefineOrdersEndpoints().WithTags("Orders");
     }
 
     private static async Task<IResult> TestHandler([FromServices] ISender sender)

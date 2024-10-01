@@ -19,6 +19,7 @@ builder.Services.AddMediatR(option =>
 // add scoped
 builder.Services.AddScoped<IApplicationDbContext, ApplicationDbContext>();
 builder.Services.AddScoped<CurrentUser>();
+builder.Services.AddScoped<AuthMiddleware>();
 builder.Services.AddSwaggerGen(option =>
 {
     option.EnableAnnotations();
@@ -86,6 +87,7 @@ if (app.Environment.IsDevelopment())
     app.MigrateDatabase<ApplicationDbContext>(async (option, _) => await option.Seed());
 }
 app.MigrateDatabase<ApplicationDbContext>(async (_, _) => await Task.Delay(0));
+app.UseMiddleware<AuthMiddleware>();
 
 app.UseHttpsRedirection();
 

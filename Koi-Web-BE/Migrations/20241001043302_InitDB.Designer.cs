@@ -9,10 +9,10 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
-namespace Koi_Web_BE.Database.Migrations
+namespace Koi_Web_BE.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240929051256_InitDB")]
+    [Migration("20241001043302_InitDB")]
     partial class InitDB
     {
         /// <inheritdoc />
@@ -42,7 +42,8 @@ namespace Koi_Web_BE.Database.Migrations
 
                     b.HasIndex("FarmId");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex("UserId")
+                        .IsUnique();
 
                     b.ToTable("Carts");
                 });
@@ -239,6 +240,9 @@ namespace Koi_Web_BE.Database.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<Guid>("FarmId")
                         .HasColumnType("uuid");
 
@@ -250,6 +254,9 @@ namespace Koi_Web_BE.Database.Migrations
 
                     b.Property<int>("Status")
                         .HasColumnType("integer");
+
+                    b.Property<DateTimeOffset?>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("UserId")
                         .IsRequired()
@@ -399,8 +406,8 @@ namespace Koi_Web_BE.Database.Migrations
                         .HasForeignKey("FarmId");
 
                     b.HasOne("Koi_Web_BE.Models.Entities.User", "User")
-                        .WithMany("Carts")
-                        .HasForeignKey("UserId")
+                        .WithOne("Carts")
+                        .HasForeignKey("Koi_Web_BE.Models.Entities.Cart", "UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -612,7 +619,8 @@ namespace Koi_Web_BE.Database.Migrations
 
             modelBuilder.Entity("Koi_Web_BE.Models.Entities.User", b =>
                 {
-                    b.Navigation("Carts");
+                    b.Navigation("Carts")
+                        .IsRequired();
 
                     b.Navigation("Farms");
 
