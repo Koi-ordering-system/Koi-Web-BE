@@ -1,6 +1,5 @@
 using Koi_Web_BE.Database;
 using Koi_Web_BE.Exceptions;
-using Koi_Web_BE.Models.Entities;
 using Koi_Web_BE.Models.Primitives;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -17,13 +16,10 @@ public class UpdateSpecies
     {
         public async Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)
         {
-            Species? updatingSpecies = await context.Species
-                .SingleOrDefaultAsync(s => s.Id.Equals(request.Id), cancellationToken);
-            if (updatingSpecies is null) return Result<Response>.Fail(new NotFoundException("Species not found."));
-
-            updatingSpecies.Name = request.Name;
-
-            await context.SaveChangesAsync(cancellationToken);
+            int result = await context.Species
+                .Where(s => s.Id.Equals(request.Id))
+                .ExecuteUpdateAsync(s => s.SetProperty(e => e.Name, request.Name), cancellationToken);
+            if (result == 0) throw new NotFoundException("Species not found.");
             return Result<Response>.Succeed(new Response());
         }
     }
