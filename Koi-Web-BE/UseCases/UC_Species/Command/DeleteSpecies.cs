@@ -17,11 +17,12 @@ public class DeleteSpecies
     {
         public async Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)
         {
-            Species? deletingSpecies = await context.Species.SingleOrDefaultAsync(s => s.Id.Equals(request.Id), cancellationToken);
-            if (deletingSpecies is null) return Result<Response>.Fail(new NotFoundException("Species not found"));
-            context.Species.Remove(deletingSpecies);
-            await context.SaveChangesAsync(cancellationToken);
-            return Result<Response>.Succeed(new Response());
+            int result = await context
+                .Species
+                .Where(x => x.Id.Equals(request.Id))
+                .ExecuteDeleteAsync(cancellationToken);
+            if (result == 0) return Result<Response>.Fail(new NotFoundException("Species not found."));
+            return Result<Response>.Succeed(null!);
         }
     }
 }

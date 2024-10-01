@@ -19,8 +19,8 @@ public class UpdateSpecies
             int result = await context.Species
                 .Where(s => s.Id.Equals(request.Id))
                 .ExecuteUpdateAsync(s => s.SetProperty(e => e.Name, request.Name), cancellationToken);
-            if (result == 0) throw new NotFoundException("Species not found.");
-            return Result<Response>.Succeed(new Response());
+            if (result == 0) return Result<Response>.Fail(new NotFoundException("Species not found."));
+            return Result<Response>.Succeed(null!);
         }
     }
 }
