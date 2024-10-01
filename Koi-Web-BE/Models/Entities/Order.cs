@@ -4,7 +4,7 @@ using Koi_Web_BE.Models.Primitives;
 
 namespace Koi_Web_BE.Models.Entities;
 
-public class Order : BaseEntity
+public class Order : BaseAuditableEntity
 {
     public required string UserId { get; set; }
     public required Guid FarmId { get; set; }

@@ -58,7 +58,6 @@ public class AuthMiddleware(IApplicationDbContext appContext) : IMiddleware
                     c.Type.Equals("imageurl", StringComparison.InvariantCultureIgnoreCase)
                 )
                 ?.Value ?? string.Empty;
-
         User? checkingUser = await appContext.Users.SingleOrDefaultAsync(u => u.Id.Equals(id));
         if (checkingUser is null)
         {

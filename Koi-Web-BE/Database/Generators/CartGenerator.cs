@@ -9,5 +9,5 @@ public class CartGenerator
         => [.. new Faker<Cart>()
             .ApplyEntitesRules()
             .RuleFor(e => e.UserId, f => f.PickRandom(users).Id)
-            .Generate(50)];
+            .Generate(50).DistinctBy(c=>c.UserId)];
 }

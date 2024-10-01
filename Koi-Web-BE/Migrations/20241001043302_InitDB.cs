@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace Koi_Web_BE.Database.Migrations
+namespace Koi_Web_BE.Migrations
 {
     /// <inheritdoc />
     public partial class InitDB : Migration
@@ -143,7 +143,9 @@ namespace Koi_Web_BE.Database.Migrations
                     FarmId = table.Column<Guid>(type: "uuid", nullable: false),
                     Price = table.Column<decimal>(type: "numeric", nullable: false),
                     IsPaid = table.Column<bool>(type: "boolean", nullable: false),
-                    Status = table.Column<int>(type: "integer", nullable: false)
+                    Status = table.Column<int>(type: "integer", nullable: false),
+                    CreatedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+                    UpdatedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -355,7 +357,8 @@ namespace Koi_Web_BE.Database.Migrations
             migrationBuilder.CreateIndex(
                 name: "IX_Carts_UserId",
                 table: "Carts",
-                column: "UserId");
+                column: "UserId",
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_Colors_KoiId",
