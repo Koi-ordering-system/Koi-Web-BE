@@ -16,6 +16,10 @@ public static class OrdersEndpoints
             .WithMetadata(new SwaggerOperationAttribute("Get Service Orders"))
             .RequireAuthorization();
 
+        // PATCH
+        app.MapPatch("/approve/{id}", ApproveTripOrderEndpointHandler.Handle)
+            .WithMetadata(new SwaggerOperationAttribute("Approve Trip Order"))
+            .RequireAuthorization();
         return app;
     }
 }
