@@ -13,6 +13,6 @@ public class OrderGenerator
             .RuleFor(e => e.FarmId, f => f.PickRandom(farms).Id)
             .RuleFor(e => e.Price, f => f.Random.Decimal(0,1000))
             .RuleFor(e=>e.IsPaid,f=>f.Random.Bool())
-            .RuleFor(e=>e.Status,f=>f.PickRandom<OrderStatusEnum>())
+            .RuleFor(e=>e.Status,f=>f.Random.Bool() ? f.PickRandom<OrderStatusEnum>() : null!)
             .Generate(50)];
 }

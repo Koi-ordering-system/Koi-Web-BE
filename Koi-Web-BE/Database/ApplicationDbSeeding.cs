@@ -36,21 +36,20 @@ public static class ApplicationDbSeeding
         OrderTrip[] orderTrips = OrderTripGenerator.Generate(orders);
         IList<Task> tasks = [];
 
-        await context.Users.AddRangeAsync(users);
-        await context.Carts.AddRangeAsync(carts);
-        await context.Species.AddRangeAsync(species);
-        await context.Kois.AddRangeAsync(kois);
-        await context.Farms.AddRangeAsync(farms);
-        await context.FarmKois.AddRangeAsync(farmKois);
-        await context.CartItems.AddRangeAsync(cartItems);
-        await context.Orders.AddRangeAsync(orders);
-        await context.Colors.AddRangeAsync(colors);
-        await context.KoiImages.AddRangeAsync(koiImages);
-        await context.FarmImages.AddRangeAsync(farmImages);
-        await context.Reviews.AddRangeAsync(reviews);
-        await context.OrderKois.AddRangeAsync(orderKois);
-        await context.OrderTrips.AddRangeAsync(orderTrips);
-
+        tasks.Add(context.Users.AddRangeAsync(users));
+        tasks.Add(context.Carts.AddRangeAsync(carts));
+        tasks.Add(context.Species.AddRangeAsync(species));
+        tasks.Add(context.Kois.AddRangeAsync(kois));
+        tasks.Add(context.Farms.AddRangeAsync(farms));
+        tasks.Add(context.FarmKois.AddRangeAsync(farmKois));
+        tasks.Add(context.CartItems.AddRangeAsync(cartItems));
+        tasks.Add(context.Orders.AddRangeAsync(orders));
+        tasks.Add(context.Colors.AddRangeAsync(colors));
+        tasks.Add(context.KoiImages.AddRangeAsync(koiImages));
+        tasks.Add(context.FarmImages.AddRangeAsync(farmImages));
+        tasks.Add(context.Reviews.AddRangeAsync(reviews));
+        tasks.Add(context.OrderKois.AddRangeAsync(orderKois));
+        tasks.Add(context.OrderTrips.AddRangeAsync(orderTrips));
         await Task.WhenAll(tasks);
 
         await context.SaveChangesAsync();

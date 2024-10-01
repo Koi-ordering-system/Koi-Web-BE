@@ -12,6 +12,7 @@ public class OrderTripGenerator
             .RuleFor(e => e.OrderId, f => f.PickRandom(orders).Id)
             .RuleFor(e=>e.StartDate,f=>f.Date.Past())
             .RuleFor(e=>e.EndDate,f=>f.Date.Future())
+            .RuleFor(e=>e.IsApproved,f=>f.Random.Bool() ? f.Random.Bool() : null!)
             .RuleFor(e => e.Status, f => f.PickRandom<TripStatusEnum>())
             .Generate(50)
             .DistinctBy(ot => new { ot.OrderId })];
