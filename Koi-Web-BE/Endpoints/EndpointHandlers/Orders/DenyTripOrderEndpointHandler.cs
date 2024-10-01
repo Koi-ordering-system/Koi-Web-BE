@@ -4,11 +4,11 @@ using MediatR;
 
 namespace Koi_Web_BE.Endpoints.EndpointHandlers.Orders;
 
-public class ApproveTripOrderEndpointHandler
+public class DenyTripOrderEndpointHandler
 {
     public async static Task<IResult> Handle(ISender sender, Guid id, CancellationToken cancellationToken = default)
     {
-        Result<ApproveTripOrder.Response> result = await sender.Send(new ApproveTripOrder.Command(id), cancellationToken);
+        Result<DenyTripOrder.Response> result = await sender.Send(new DenyTripOrder.Command(id), cancellationToken);
         if (!result.Succeeded) return Results.BadRequest(result);
         return Results.NoContent();
     }
