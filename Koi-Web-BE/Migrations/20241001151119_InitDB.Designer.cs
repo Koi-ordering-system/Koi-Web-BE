@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Koi_Web_BE.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20241001043302_InitDB")]
+    [Migration("20241001151119_InitDB")]
     partial class InitDB
     {
         /// <inheritdoc />
@@ -308,6 +308,9 @@ namespace Koi_Web_BE.Migrations
 
                     b.Property<DateTimeOffset>("EndDate")
                         .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool?>("IsApproved")
+                        .HasColumnType("boolean");
 
                     b.Property<Guid>("OrderId")
                         .HasColumnType("uuid");

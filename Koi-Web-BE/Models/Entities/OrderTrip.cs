@@ -6,10 +6,10 @@ namespace Koi_Web_BE.Models.Entities;
 
 public class OrderTrip : BaseEntity
 {
-    public new required Guid Id { get; set; }
     public required Guid OrderId { get; set; }
     public required DateTimeOffset StartDate { get; set; }
     public required DateTimeOffset EndDate { get; set; }
+    public bool? IsApproved { get; set; } = null!;
     public TripStatusEnum Status { get; set; } = TripStatusEnum.Pending;
     [ForeignKey(nameof(OrderId))]
     public Order Order { get; set; } = null!;

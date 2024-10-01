@@ -11,6 +11,11 @@ public static class OrdersEndpoints
         app.MapGet("/personal", GetPersonalOrdersEndpointHandler.Handle)
             .WithMetadata(new SwaggerOperationAttribute("Get Personal Orders"))
             .RequireAuthorization();
+
+        app.MapGet("/service", GetServiceOrdersEndpointHandler.Handle)
+            .WithMetadata(new SwaggerOperationAttribute("Get Service Orders"))
+            .RequireAuthorization();
+
         return app;
     }
 }
