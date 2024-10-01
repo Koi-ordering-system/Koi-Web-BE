@@ -28,36 +28,17 @@ public class AuthMiddleware(IApplicationDbContext appContext) : IMiddleware
             await next.Invoke(context);
             return;
         }
-        string? id =
-            claims
-                .FirstOrDefault(c =>
-                    c.Type.Equals("id", StringComparison.InvariantCultureIgnoreCase)
-                )
-                ?.Value ?? string.Empty;
-        string? username =
-            claims
-                .FirstOrDefault(c =>
-                    c.Type.Equals("username", StringComparison.InvariantCultureIgnoreCase)
-                )
-                ?.Value ?? string.Empty;
-        string? email =
-            claims
-                .FirstOrDefault(c =>
-                    c.Type.Equals("email", StringComparison.InvariantCultureIgnoreCase)
-                )
-                ?.Value ?? string.Empty;
-        string? phoneNumber =
-            claims
-                .FirstOrDefault(c =>
-                    c.Type.Equals("phonenumber", StringComparison.InvariantCultureIgnoreCase)
-                )
-                ?.Value ?? string.Empty;
-        string? imageUrl =
-            claims
-                .FirstOrDefault(c =>
-                    c.Type.Equals("imageurl", StringComparison.InvariantCultureIgnoreCase)
-                )
-                ?.Value ?? string.Empty;
+        var idClaim = claims.FirstOrDefault(c => c.Type.Equals("id", StringComparison.InvariantCultureIgnoreCase));
+        var usernameClaim = claims.FirstOrDefault(c => c.Type.Equals("username", StringComparison.InvariantCultureIgnoreCase));
+        var emailClaim = claims.FirstOrDefault(c => c.Type.Equals("email", StringComparison.InvariantCultureIgnoreCase));
+        var phoneNumberClaim = claims.FirstOrDefault(c => c.Type.Equals("phonenumber", StringComparison.InvariantCultureIgnoreCase));
+        var imageUrlClaim = claims.FirstOrDefault(c => c.Type.Equals("imageurl", StringComparison.InvariantCultureIgnoreCase));
+
+        string? id = idClaim?.Value ?? string.Empty;
+        string? username = usernameClaim?.Value ?? string.Empty;
+        string? email = emailClaim?.Value ?? string.Empty;
+        string? phoneNumber = phoneNumberClaim?.Value ?? string.Empty;
+        string? imageUrl = imageUrlClaim?.Value ?? string.Empty;
         User? checkingUser = await appContext.Users.SingleOrDefaultAsync(u => u.Id.Equals(id));
         if (checkingUser is null)
         {
