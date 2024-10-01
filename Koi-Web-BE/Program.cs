@@ -83,7 +83,7 @@ var app = builder.ConfigureServices();
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseSwaggerUI(option => option.DisplayRequestDuration());
     app.MigrateDatabase<ApplicationDbContext>(async (option, _) => await option.Seed());
 }
 app.MigrateDatabase<ApplicationDbContext>(async (_, _) => await Task.Delay(0));
