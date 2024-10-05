@@ -1,9 +1,11 @@
 using Koi_Web_BE.Database;
+using Koi_Web_BE.Endpoints.Internal;
 using Koi_Web_BE.Exceptions;
 using Koi_Web_BE.Models.Entities;
 using Koi_Web_BE.Models.Primitives;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Swashbuckle.AspNetCore.Annotations;
 
 namespace Koi_Web_BE.UseCases.UC_Species.Queries;
 
@@ -26,6 +28,23 @@ public class GetSpeciesById
                 .SingleOrDefaultAsync(s => s.Id.Equals(request.Id), cancellationToken);
             if (gettingSpecies == null) return Result<Response>.Fail(new NotFoundException("Species not found."));
             return Result<Response>.Succeed(Response.FromEntity(gettingSpecies));
+        }
+    }
+
+    public class Endpoint : IEndpoints
+    {
+        public static void DefineEndpoints(IEndpointRouteBuilder app)
+        {
+            app.MapGet("api/species/{id}", Handle)
+            .WithTags("Species")
+            .WithMetadata(new SwaggerOperationAttribute("Get a Species"))
+            .RequireAuthorization();
+        }
+        public static async Task<IResult> Handle(ISender sender, Guid id, CancellationToken cancellationToken = default)
+        {
+            Result<Response> query = await sender.Send(new Query(id), cancellationToken);
+            if (!query.Succeeded) return Results.NotFound(query);
+            return Results.Ok(query);
         }
     }
 }
