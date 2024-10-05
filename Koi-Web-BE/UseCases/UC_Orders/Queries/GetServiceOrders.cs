@@ -1,10 +1,11 @@
 using Koi_Web_BE.Models.Entities;
 using Koi_Web_BE.Database;
-using Koi_Web_BE.Models.Entities;
 using Koi_Web_BE.Models.Enums;
 using Koi_Web_BE.Models.Primitives;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Koi_Web_BE.Endpoints.Internal;
+using Swashbuckle.AspNetCore.Annotations;
 
 namespace Koi_Web_BE.UseCases.UC_Orders.Queries;
 
@@ -76,4 +77,23 @@ public class GetServiceOrders
             ));
         }
     }
+
+    public class Endpoint : IEndpoints
+    {
+        public static void DefineEndpoints(IEndpointRouteBuilder app)
+        {
+            app.MapGet("api/orders/service", Handle)
+            .WithTags("Orders")
+            .WithMetadata(new SwaggerOperationAttribute("Get Service Orders"))
+            .RequireAuthorization();
+        }
+
+        public static async Task<IResult> Handle(ISender sender, int pageIndex = 1, int pageSize = 10, CancellationToken cancellationToken = default)
+        {
+            Result<Response> response = await sender.Send(new Query(pageIndex, pageSize), cancellationToken);
+            if (!response.Succeeded) return Results.NotFound(response);
+            return Results.Ok(response);
+        }
+    }
+
 }

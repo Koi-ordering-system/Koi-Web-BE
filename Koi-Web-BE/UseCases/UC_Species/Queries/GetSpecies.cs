@@ -1,8 +1,10 @@
 using Koi_Web_BE.Database;
+using Koi_Web_BE.Endpoints.Internal;
 using Koi_Web_BE.Models.Entities;
 using Koi_Web_BE.Models.Primitives;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Swashbuckle.AspNetCore.Annotations;
 
 namespace Koi_Web_BE.UseCases.UC_Species.Queries;
 
@@ -53,6 +55,23 @@ public class GetSpecies
                 PageSize: request.PageSize,
                 TotalPages: (int)Math.Ceiling((double)total / request.PageSize)
             ));
+        }
+    }
+
+    public class Endpoint : IEndpoints
+    {
+        public static void DefineEndpoints(IEndpointRouteBuilder app)
+        {
+            app.MapGet("/api/species", Handle)
+            .WithTags("Species")
+            .WithMetadata(new SwaggerOperationAttribute("Get all Species"))
+            .RequireAuthorization();
+        }
+        public static async Task<IResult> Handle(ISender sender, string Keyword = "", int PageIndex = 1, int PageSize = 10, CancellationToken cancellationToken = default)
+        {
+            Result<Response> response = await sender.Send(new Query(Keyword, PageIndex, PageSize), cancellationToken);
+            if (!response.Succeeded) return Results.NotFound(response);
+            return Results.Ok(response);
         }
     }
 }

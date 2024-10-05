@@ -1,8 +1,10 @@
 using Koi_Web_BE.Database;
+using Koi_Web_BE.Endpoints.Internal;
 using Koi_Web_BE.Models.Entities;
 using Koi_Web_BE.Models.Primitives;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Swashbuckle.AspNetCore.Annotations;
 
 namespace Koi_Web_BE.UseCases.UC_Orders.Queries;
 
@@ -38,8 +40,25 @@ public class GetPersonalOrders
                 FarmName: order.Farm?.Name ?? string.Empty,
                 Price: order.Price,
                 IsPaid: order.IsPaid,
-                Status: order.Status.ToString()
+                Status: order.Status.ToString() ?? string.Empty
             );
+    }
+
+    public class Endpoint : IEndpoints
+    {
+        public static void DefineEndpoints(IEndpointRouteBuilder app)
+            => app.MapGet("api/orders/personal", Handle)
+                .WithTags("Orders")
+                .WithMetadata(new SwaggerOperationAttribute("Get Personal Orders"))
+                .RequireAuthorization();
+
+        public async static Task<IResult> Handle(ISender sender, int pageIndex = 1, int pageSize = 10, CancellationToken cancellationToken = default)
+        {
+            Result<Response> response = await sender
+                        .Send(new Query(pageIndex, pageSize), cancellationToken);
+            if (!response.Succeeded) return Results.NotFound(response);
+            return Results.Ok(response);
+        }
     }
 
     public class Handler(IApplicationDbContext context, CurrentUser currentUser) : IRequestHandler<Query, Result<Response>>
