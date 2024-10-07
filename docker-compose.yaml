@@ -1,0 +1,46 @@
+version: "3.7"
+services:
+  frontend:
+    container_name: koi_frontend
+    image: persiedacoder/koi-fe
+    ports:
+      - 3000:3000
+    restart: unless-stopped
+
+  backend:
+    container_name: koi_backend
+    image: persiedacoder/koi-be
+    environment:
+      - CONNECTION_STRING=User ID=postgres;Password=postgres;Host=postgres;Port=5432;Database=KoiDB;Include Error Detail=true
+    ports:
+      - 8888:8080
+    depends_on:
+      - postgres
+    restart: unless-stopped
+
+  postgres:
+    container_name: koi_postgres
+    image: postgres:16.4-bullseye
+    ports:
+      - 5432:5432
+    environment:
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=KoiDB
+    restart: unless-stopped
+    volumes:
+      - data:/var/lib/postgresql/data
+
+  watchtower:
+    container_name: koi_watchtower
+    restart: unless-stopped
+    image: containrrr/watchtower
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    command:
+      - "--cleanup"
+      - "--rolling-restart"
+      - "--label-enable"
+      - "30"
+
+volumes:
+  data:
