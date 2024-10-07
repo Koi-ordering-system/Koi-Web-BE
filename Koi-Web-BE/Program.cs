@@ -18,7 +18,7 @@ builder.Services.AddMediatR(option =>
 });
 
 // add ENV
-DotEnv.Load();
+DotEnv.Load(options: new DotEnvOptions(probeForEnv: true));
 var envVars = DotEnv.Read();
 // add scoped
 builder.Services.AddScoped<IApplicationDbContext, ApplicationDbContext>();
