@@ -1,4 +1,5 @@
 ﻿using System.Reflection;
+using CloudinaryDotNet;
 using FluentValidation;
 using Koi_Web_BE.Behaviors;
 using Koi_Web_BE.Database;
@@ -23,6 +24,7 @@ public static class HostingExtensions
     {
         builder.LoadEnv();
         var configuration = builder.Configuration;
+        builder.Services.AddScoped(s => new Cloudinary(Environment.GetEnvironmentVariable("CLOUDINARY_URL")));
 
         builder.Services.AddEndpointsApiExplorer();
         builder.Services.AddSwaggerGen();
