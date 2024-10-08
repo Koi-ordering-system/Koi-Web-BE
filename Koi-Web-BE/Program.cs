@@ -4,7 +4,6 @@ using Koi_Web_BE.Endpoints.Internal;
 using Koi_Web_BE.Middlewares;
 using Koi_Web_BE.Models.Primitives;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 
