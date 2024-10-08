@@ -23,18 +23,18 @@ public static class HostingExtensions
     {
         builder.LoadEnv();
         var configuration = builder.Configuration;
-        
+
         builder.Services.AddEndpointsApiExplorer();
         builder.Services.AddSwaggerGen();
 
         builder.Services.Configure<RouteHandlerOptions>(opt => opt.ThrowOnBadRequest = true);
         builder.Services.AddHttpContextAccessor();
-        
+
         builder.Services.AddSingleton<ExceptionMiddleware>();
-        
-        var connectionString = configuration.GetConnectionString("DefaultConnection")
+
+        var connectionString = configuration["CONNECTION_STRING"]
                                ?? throw new InvalidOperationException("DefaultConnection are missing");
-        
+
         builder.Services.AddScoped<ISaveChangesInterceptor, DispatchDomainEventsInterceptor>();
         builder.Services.AddScoped<ISaveChangesInterceptor, UpdateAuditableInterceptor>();
         builder.Services.AddDbContext<ApplicationDbContext>((sp, options) =>
@@ -42,10 +42,10 @@ public static class HostingExtensions
             options.AddInterceptors(sp.GetServices<ISaveChangesInterceptor>());
             options.EnableSensitiveDataLogging();
 
-            options.UseNpgsql(connectionString)
-                .UseSnakeCaseNamingConvention();
+            options.UseNpgsql(connectionString);
+            // .UseSnakeCaseNamingConvention();
         });
-        
+
         builder.Services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
         builder.Services.AddMediatR(config =>
         {
@@ -55,7 +55,7 @@ public static class HostingExtensions
 
         return builder.Build();
     }
-   
+
     /// <summary>
     /// LoadEnv loads environment variables from .env file corresponding
     /// to the application environment name and add to configuration 
