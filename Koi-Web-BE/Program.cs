@@ -18,8 +18,8 @@ builder.Services.AddMediatR(option =>
 });
 
 // add ENV
-DotEnv.Load(options: new DotEnvOptions(probeForEnv: true));
-var envVars = DotEnv.Read();
+// DotEnv.Load(options: new DotEnvOptions(probeForEnv: true));
+// var envVars = DotEnv.Read();
 // add scoped
 builder.Services.AddScoped<IApplicationDbContext, ApplicationDbContext>();
 builder.Services.AddScoped<CurrentUser>();
@@ -56,7 +56,8 @@ builder.Services.AddSwaggerGen(option =>
 // add database
 builder.Services.AddDbContext<ApplicationDbContext>(option =>
 {
-    option.UseNpgsql(envVars["CONNECTION_STRING"]);
+    // option.UseNpgsql(envVars["CONNECTION_STRING"]);
+    option.UseNpgsql(Environment.GetEnvironmentVariable("CONNECTION_STRING"));
 });
 
 builder.Services.AddCors(option =>
