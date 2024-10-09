@@ -3,14 +3,30 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace Koi_Web_BE.Migrations
+namespace Koi_Web_BE.Database.Migrations
 {
     /// <inheritdoc />
-    public partial class InitDB : Migration
+    public partial class UpdateDB : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.CreateTable(
+                name: "Farms",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    Name = table.Column<string>(type: "text", nullable: false),
+                    Owner = table.Column<string>(type: "text", nullable: false),
+                    Address = table.Column<string>(type: "text", nullable: false),
+                    Description = table.Column<string>(type: "text", nullable: false),
+                    Rating = table.Column<decimal>(type: "numeric", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Farms", x => x.Id);
+                });
+
             migrationBuilder.CreateTable(
                 name: "Species",
                 columns: table => new
@@ -40,82 +56,6 @@ namespace Koi_Web_BE.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Farms",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    Name = table.Column<string>(type: "text", nullable: false),
-                    Owner = table.Column<string>(type: "text", nullable: false),
-                    Address = table.Column<string>(type: "text", nullable: false),
-                    Description = table.Column<string>(type: "text", nullable: false),
-                    Rating = table.Column<decimal>(type: "numeric", nullable: false),
-                    UserId = table.Column<string>(type: "text", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Farms", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Farms_Users_UserId",
-                        column: x => x.UserId,
-                        principalTable: "Users",
-                        principalColumn: "Id");
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Kois",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    SpeciesId = table.Column<Guid>(type: "uuid", nullable: false),
-                    Name = table.Column<string>(type: "text", nullable: false),
-                    Description = table.Column<string>(type: "text", nullable: false),
-                    MinSize = table.Column<decimal>(type: "numeric", nullable: false),
-                    MaxSize = table.Column<decimal>(type: "numeric", nullable: false),
-                    IsMale = table.Column<bool>(type: "boolean", nullable: false),
-                    Price = table.Column<decimal>(type: "numeric", nullable: false),
-                    UserId = table.Column<string>(type: "text", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Kois", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Kois_Species_SpeciesId",
-                        column: x => x.SpeciesId,
-                        principalTable: "Species",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_Kois_Users_UserId",
-                        column: x => x.UserId,
-                        principalTable: "Users",
-                        principalColumn: "Id");
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Carts",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    UserId = table.Column<string>(type: "text", nullable: false),
-                    FarmId = table.Column<Guid>(type: "uuid", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Carts", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Carts_Farms_FarmId",
-                        column: x => x.FarmId,
-                        principalTable: "Farms",
-                        principalColumn: "Id");
-                    table.ForeignKey(
-                        name: "FK_Carts_Users_UserId",
-                        column: x => x.UserId,
-                        principalTable: "Users",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "FarmImages",
                 columns: table => new
                 {
@@ -135,6 +75,48 @@ namespace Koi_Web_BE.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Kois",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    SpeciesId = table.Column<Guid>(type: "uuid", nullable: false),
+                    Name = table.Column<string>(type: "text", nullable: false),
+                    Description = table.Column<string>(type: "text", nullable: false),
+                    MinSize = table.Column<decimal>(type: "numeric", nullable: false),
+                    MaxSize = table.Column<decimal>(type: "numeric", nullable: false),
+                    IsMale = table.Column<bool>(type: "boolean", nullable: false),
+                    Price = table.Column<decimal>(type: "numeric", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Kois", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Kois_Species_SpeciesId",
+                        column: x => x.SpeciesId,
+                        principalTable: "Species",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Carts",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    UserId = table.Column<string>(type: "text", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Carts", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Carts_Users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Orders",
                 columns: table => new
                 {
@@ -143,7 +125,7 @@ namespace Koi_Web_BE.Migrations
                     FarmId = table.Column<Guid>(type: "uuid", nullable: false),
                     Price = table.Column<decimal>(type: "numeric", nullable: false),
                     IsPaid = table.Column<bool>(type: "boolean", nullable: false),
-                    Status = table.Column<int>(type: "integer", nullable: false),
+                    Status = table.Column<int>(type: "integer", nullable: true),
                     CreatedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
                     UpdatedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true)
                 },
@@ -241,8 +223,7 @@ namespace Koi_Web_BE.Migrations
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     KoiId = table.Column<Guid>(type: "uuid", nullable: false),
-                    Url = table.Column<string>(type: "text", nullable: false),
-                    UserId = table.Column<string>(type: "text", nullable: true)
+                    Url = table.Column<string>(type: "text", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -253,11 +234,6 @@ namespace Koi_Web_BE.Migrations
                         principalTable: "Kois",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_KoiImages_Users_UserId",
-                        column: x => x.UserId,
-                        principalTable: "Users",
-                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -267,8 +243,7 @@ namespace Koi_Web_BE.Migrations
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     OrderId = table.Column<Guid>(type: "uuid", nullable: false),
                     KoiId = table.Column<Guid>(type: "uuid", nullable: false),
-                    Quantity = table.Column<int>(type: "integer", nullable: false),
-                    UserId = table.Column<string>(type: "text", nullable: true)
+                    Quantity = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -285,11 +260,6 @@ namespace Koi_Web_BE.Migrations
                         principalTable: "Orders",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_OrderKois_Users_UserId",
-                        column: x => x.UserId,
-                        principalTable: "Users",
-                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -351,11 +321,6 @@ namespace Koi_Web_BE.Migrations
                 column: "FarmKoiId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Carts_FarmId",
-                table: "Carts",
-                column: "FarmId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_Carts_UserId",
                 table: "Carts",
                 column: "UserId",
@@ -382,29 +347,14 @@ namespace Koi_Web_BE.Migrations
                 column: "KoiId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Farms_UserId",
-                table: "Farms",
-                column: "UserId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_KoiImages_KoiId",
                 table: "KoiImages",
                 column: "KoiId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_KoiImages_UserId",
-                table: "KoiImages",
-                column: "UserId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_Kois_SpeciesId",
                 table: "Kois",
                 column: "SpeciesId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Kois_UserId",
-                table: "Kois",
-                column: "UserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_OrderKois_KoiId",
@@ -415,11 +365,6 @@ namespace Koi_Web_BE.Migrations
                 name: "IX_OrderKois_OrderId",
                 table: "OrderKois",
                 column: "OrderId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_OrderKois_UserId",
-                table: "OrderKois",
-                column: "UserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Orders_FarmId",
@@ -488,10 +433,10 @@ namespace Koi_Web_BE.Migrations
                 name: "Farms");
 
             migrationBuilder.DropTable(
-                name: "Species");
+                name: "Users");
 
             migrationBuilder.DropTable(
-                name: "Users");
+                name: "Species");
         }
     }
 }
