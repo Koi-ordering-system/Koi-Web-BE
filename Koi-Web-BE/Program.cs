@@ -82,6 +82,7 @@ if (app.Environment.IsDevelopment())
 }
 app.MigrateDatabase<ApplicationDbContext>(async (_, _) => await Task.Delay(0));
 app.UseMiddleware<AuthMiddleware>();
+app.UseMiddleware<ExceptionMiddleware>();
 
 app.UseHttpsRedirection();
 
