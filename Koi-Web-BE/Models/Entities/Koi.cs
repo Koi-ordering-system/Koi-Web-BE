@@ -15,6 +15,8 @@ public class Koi : BaseEntity
     // Relations
     [ForeignKey(nameof(SpeciesId))]
     public Species Species { get; set; } = null!;
+    public IList<FarmKoi> FarmKois { get; set; } = [];
+    public IList<Color> Colors { get; set; } = [];
     public IList<KoiImage> Images { get; set; } = [];
     public IList<OrderKoi> OrderKois { get; set; } = [];
 }
