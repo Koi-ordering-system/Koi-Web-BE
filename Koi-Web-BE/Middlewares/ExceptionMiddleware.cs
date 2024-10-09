@@ -52,6 +52,11 @@ public class ExceptionMiddleware : IMiddleware
         // cannot be used to complete the execution, say when a parent entity does not exist
         // when trying to update/modify the primary entity
         // { typeof(BadHttpRequestException), HandleBadHttpRequestException },
+
+        // a ForbiddenException is thrown when the user does not have the necessary permissions
+        // to access the requested resource or perform the requested action. This can occur
+        // during authorization checks before executing the main logic of the request.
+        { typeof(ForbiddenException), HandleForbiddenException}
     };
 
     private Task HandleExceptionAsync(HttpContext context, Exception ex)
@@ -124,5 +129,11 @@ public class ExceptionMiddleware : IMiddleware
     private static byte[] SerializeToUtf8BytesWeb<T>(T value)
     {
         return JsonSerializer.SerializeToUtf8Bytes(value, new JsonSerializerOptions(JsonSerializerDefaults.Web));
+    }
+
+    private static async void HandleForbiddenException(HttpContext context, Exception ex)
+    {
+        context.Response.StatusCode = StatusCodes.Status403Forbidden;
+        await WriteExceptionMessageAsync(context, ex);
     }
 }
