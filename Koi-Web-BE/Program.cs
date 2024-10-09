@@ -1,11 +1,9 @@
-using dotenv.net;
 using Koi_Web_BE;
 using Koi_Web_BE.Database;
 using Koi_Web_BE.Endpoints.Internal;
 using Koi_Web_BE.Middlewares;
 using Koi_Web_BE.Models.Primitives;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 
@@ -17,9 +15,6 @@ builder.Services.AddMediatR(option =>
     option.RegisterServicesFromAssembly(typeof(Program).Assembly);
 });
 
-// add ENV
-DotEnv.Load(options: new DotEnvOptions(probeForEnv: true));
-var envVars = DotEnv.Read();
 // add scoped
 builder.Services.AddScoped<IApplicationDbContext, ApplicationDbContext>();
 builder.Services.AddScoped<CurrentUser>();
@@ -53,11 +48,6 @@ builder.Services.AddSwaggerGen(option =>
     });
 });
 
-// add database
-builder.Services.AddDbContext<ApplicationDbContext>(option =>
-{
-    option.UseNpgsql(envVars["CONNECTION_STRING"]);
-});
 
 builder.Services.AddCors(option =>
 {
