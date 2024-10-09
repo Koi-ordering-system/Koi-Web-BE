@@ -5,6 +5,7 @@ using Koi_Web_BE.Behaviors;
 using Koi_Web_BE.Database;
 using Koi_Web_BE.Database.Interceptors;
 using Koi_Web_BE.Middlewares;
+using Koi_Web_BE.Utils;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
@@ -39,6 +40,7 @@ public static class HostingExtensions
 
         builder.Services.AddScoped<ISaveChangesInterceptor, DispatchDomainEventsInterceptor>();
         builder.Services.AddScoped<ISaveChangesInterceptor, UpdateAuditableInterceptor>();
+        builder.Services.AddScoped<IImageService, ImageService>();
         builder.Services.AddDbContext<ApplicationDbContext>((sp, options) =>
         {
             options.AddInterceptors(sp.GetServices<ISaveChangesInterceptor>());
