@@ -12,11 +12,7 @@ public class User : BaseEntity
     public required string PhoneNumber { get; set; }
     public RoleEnum Role { get; set; } = RoleEnum.Customer;
     // Relations
-    public IList<Farm> Farms { get; set; } = [];
     public IList<Order> Orders { get; set; } = [];
     public Cart Carts { get; set; } = null!;
-    public IList<Koi> Kois { get; set; } = [];
     public IList<Review> Reviews { get; set; } = [];
-    public IList<OrderKoi> OrderKois { get; set; } = [];
-    public IList<KoiImage> KoiImages { get; set; } = [];
 }

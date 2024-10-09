@@ -11,6 +11,8 @@ services:
     container_name: koi_backend
     image: persiedacoder/koi-be
     env_file: .env
+    environment:
+      - CONNECTION_STRING=User ID=postgres;Password=postgres;Host=localhost;Port=5432;Database=KoiDB;Include Error Detail=true
     ports:
       - 8888:8080
     depends_on:

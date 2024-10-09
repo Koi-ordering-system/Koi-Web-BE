@@ -10,7 +10,8 @@ public class Farm : BaseEntity
     public string Description { get; set; } = string.Empty;
     public decimal Rating { get; set; } = 0;
     // Relations
-    public IList<Cart> Carts { get; set; } = [];
     public IList<FarmKoi> FarmKois { get; set; } = [];
+    public IList<FarmImage> FarmImages { get; set; } = [];
+    public IList<Review> Reviews { get; set; } = [];
     public IList<Order> Orders { get; set; } = [];
 }
