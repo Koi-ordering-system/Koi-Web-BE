@@ -46,7 +46,7 @@ public class UpdateFarm
                 .Select(farmImage => imageService.DeleteImageAsync(farmImage.Url)).ToList();
             await Task.WhenAll(deleteTasks);
             if (deleteTasks.Any(task => !task.Result))
-                throw new InvalidOperationException("Failed to delete images from Cloudinary");
+                return Result<Response>.Fail(new InvalidOperationException("Failed to delete images from Cloudinary"));
             // Update the farm entity
             updatingFarm.Update(request.Name, request.Owner, request.Address, request.Description, request.Rating);
             // Upload images to Cloudinary and add URLs to the farm
