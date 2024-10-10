@@ -1,4 +1,3 @@
-using CloudinaryDotNet.Actions;
 using FluentValidation;
 using Koi_Web_BE.Database;
 using Koi_Web_BE.Endpoints.Internal;
@@ -8,13 +7,15 @@ using Koi_Web_BE.Models.Primitives;
 using Koi_Web_BE.Utils;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Swashbuckle.AspNetCore.Annotations;
 
 namespace Koi_Web_BE.UseCases.UC_Farms.Commands;
 
-public class CreateFarm
+public class UpdateFarm
 {
     public record Command(
+        Guid Id,
         string Name,
         string Owner,
         string Address,
@@ -23,17 +24,7 @@ public class CreateFarm
         IFormFileCollection FarmImages
     ) : IRequest<Result<Response>>;
 
-    public record Response(
-        Guid Id,
-        string Name
-    )
-    {
-        public static Response FromEntity(Farm farm)
-            => new(
-                Id: farm.Id,
-                Name: farm.Name
-            );
-    }
+    public record Response();
 
     public class Handler(IApplicationDbContext context, CurrentUser currentUser, IImageService imageService) : IRequestHandler<Command, Result<Response>>
     {
@@ -42,32 +33,36 @@ public class CreateFarm
             // Check if the current user is an admin
             if (!currentUser.User!.IsAdmin())
                 return Result<Response>.Fail(new ForbiddenException("The current user is not an admin"));
-            // Initialize the farm entity
-            Farm addingFarm = new()
-            {
-                Name = request.Name,
-                Owner = request.Owner,
-                Address = request.Address,
-                Description = request.Description,
-                Rating = request.Rating
-            };
+            // Get the farm entity
+            Farm? updatingFarm = await context.Farms
+                .Include(farm => farm.FarmImages)
+                .SingleOrDefaultAsync(f => f.Id == request.Id, cancellationToken);
+            if (updatingFarm == null)
+                return Result<Response>.Fail(new NotFoundException("Farm not found"));
+            // Remove farm images in database
+            context.FarmImages.RemoveRange(updatingFarm.FarmImages.ToList());
+            // Remove farm images in cloudinary
+            var deleteTasks = updatingFarm.FarmImages
+                .Select(farmImage => imageService.DeleteImageAsync(farmImage.Url)).ToList();
+            await Task.WhenAll(deleteTasks);
+            if (deleteTasks.Any(task => !task.Result))
+                throw new InvalidOperationException("Failed to delete images from Cloudinary");
+            // Update the farm entity
+            updatingFarm.Update(request.Name, request.Owner, request.Address, request.Description, request.Rating);
             // Upload images to Cloudinary and add URLs to the farm
             var uploadTasks = request.FarmImages.Select(async image =>
             {
                 var imageUrl = await imageService.UploadImageAsync(image, image.FileName, "farms");
                 return new FarmImage
                 {
-                    FarmId = addingFarm.Id,
+                    FarmId = updatingFarm.Id,
                     Url = imageUrl
                 };
             });
-            var farmImages = await Task.WhenAll(uploadTasks);
-            ((List<FarmImage>)addingFarm.FarmImages).AddRange(farmImages);
-            // Add to database
-            context.Farms.Add(addingFarm);
+            context.FarmImages.AddRange(await Task.WhenAll(uploadTasks));
+            // Save changes to the database
             await context.SaveChangesAsync(cancellationToken);
-            // Return result
-            return Result<Response>.Succeed(Response.FromEntity(addingFarm));
+            return Result<Response>.Succeed(null!);
         }
     }
 
@@ -75,14 +70,16 @@ public class CreateFarm
     {
         public static void DefineEndpoints(IEndpointRouteBuilder app)
         {
-            app.MapPost("api/farms", Handle)
-            .WithTags("Farms")
-            .WithMetadata(new SwaggerOperationAttribute("Create a Farm"))
-            .RequireAuthorization()
-            .DisableAntiforgery();
+            app.MapPut("api/farms/{id}", Handle)
+                .WithTags("Farms")
+                .WithMetadata(new SwaggerOperationAttribute("Update a Farm"))
+                .RequireAuthorization()
+                .DisableAntiforgery();
         }
+
         public static async Task<IResult> Handle(
             ISender sender,
+            [FromForm] Guid id,
             [FromForm] string name,
             [FromForm] string owner,
             [FromForm] string address,
@@ -91,16 +88,10 @@ public class CreateFarm
             IFormFileCollection farmImages,
             CancellationToken cancellationToken = default)
         {
-            Result<Response> result = await sender.Send(new Command(
-                Name: name,
-                Owner: owner,
-                Address: address,
-                Description: description,
-                Rating: rating,
-                FarmImages: farmImages), cancellationToken);
+            Result<Response> result = await sender.Send(new Command(id, name, owner, address, description, rating, farmImages), cancellationToken);
             if (!result.Succeeded)
                 return Results.BadRequest(result);
-            return Results.Created("", result);
+            return Results.NoContent();
         }
     }
 

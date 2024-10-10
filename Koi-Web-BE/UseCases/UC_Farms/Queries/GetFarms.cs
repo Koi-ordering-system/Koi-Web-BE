@@ -18,6 +18,7 @@ public class GetFarms
     ) : IRequest<Result<Response>>;
 
     public record FarmResponse(
+        Guid Id,
         string Name,
         string Owner,
         string Address,
@@ -29,6 +30,7 @@ public class GetFarms
 
         public static FarmResponse FromEntity(Farm farm)
             => new(
+                Id: farm.Id,
                 Name: farm.Name,
                 Owner: farm.Owner,
                 Address: farm.Address,
@@ -51,8 +53,8 @@ public class GetFarms
         {
             IQueryable<Farm> query = context.Farms
                 .AsNoTracking()
-                .Include(f => f.FarmKois)
-                .Where(f => f.Name.Contains(request.Name));
+                .Include(f => f.FarmImages)
+                .Where(f => f.Name.ToLower().Contains(request.Name.ToLower()));
             //calculate total pages
             var totalFarms = await query.CountAsync(cancellationToken);
             var totalPages = (int)Math.Ceiling(totalFarms / (double)request.PageSize);
