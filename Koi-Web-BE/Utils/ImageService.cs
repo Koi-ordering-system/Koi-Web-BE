@@ -25,4 +25,13 @@ public class ImageService(Cloudinary cloudinaryService) : IImageService
         if (uploadResult is null) return string.Empty;
         return uploadResult.Url.ToString();
     }
+    public async Task<bool> DeleteImageAsync(string url)
+    {
+        var segments = url.Split('/');
+        var publicIdSegment = string.Join("/", segments[^2..]); // Fetch elements from the one before the last to the end
+        var publicId = publicIdSegment.Split('.').First();
+        var deleteParams = new DeletionParams(publicId);
+        var result = await cloudinaryService.DestroyAsync(deleteParams);
+        return result.Result == "ok";
+    }
 }
