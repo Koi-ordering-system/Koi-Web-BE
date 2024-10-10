@@ -113,7 +113,7 @@ public class CreateFarm
             RuleFor(x => x.Address).NotEmpty().WithMessage("Address is required.");
             RuleFor(x => x.Description).NotEmpty().WithMessage("Description is required.");
             RuleFor(x => x.Rating).InclusiveBetween(0, 5).WithMessage("Rating must be between 0 and 5.");
-            RuleFor(x => x.FarmImages).NotEmpty().WithMessage("At least one image is required.")
+            RuleFor(x => x.FarmImages)
                 .Must(HaveValidImageSizes).WithMessage("All images must be less than 10MB.");
         }
 
