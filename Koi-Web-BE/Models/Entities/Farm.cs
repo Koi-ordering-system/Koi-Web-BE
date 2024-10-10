@@ -14,4 +14,13 @@ public class Farm : BaseEntity
     public IList<FarmImage> FarmImages { get; set; } = [];
     public IList<Review> Reviews { get; set; } = [];
     public IList<Order> Orders { get; set; } = [];
+
+    public void Update(string name, string owner, string address, string description, decimal rating)
+    {
+        Name = name;
+        Owner = owner;
+        Address = address;
+        Description = description;
+        Rating = rating;
+    }
 }
