@@ -21,10 +21,12 @@ public class DeleteImages
         public async Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)
         {
             //check whether user has permission
-            if (!currentUser.User!.IsAdmin())
-                return Result<Response>.Fail(new ForbiddenException("The current user is not an admin"));
+            // if (!currentUser.User!.IsAdmin())
+            //     return Result<Response>.Fail(new ForbiddenException("The current user is not an admin"));
             //check request images are existed
-            var deleteImages = context.FarmImages.Where(fi => request.ImageIds.Contains(fi.Id));
+            var deleteImages = context.FarmImages
+                .AsNoTracking()
+                .Where(fi => request.ImageIds.Contains(fi.Id));
             if (deleteImages.Count() != request.ImageIds.Count())
                 return Result<Response>.Fail(new NotFoundException("request contain file id does not exist"));
             //delete files from database
