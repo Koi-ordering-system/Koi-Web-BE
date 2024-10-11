@@ -17,6 +17,18 @@ public class GetFarms
         string Name
     ) : IRequest<Result<Response>>;
 
+    public record ImageResponse(
+        Guid Id,
+        string Url
+    )
+    {
+        public static ImageResponse FromEntity(FarmImage farmImage)
+            => new(
+                Id: farmImage.Id,
+                Url: farmImage.Url
+            );
+    };
+
     public record FarmResponse(
         Guid Id,
         string Name,
@@ -24,7 +36,7 @@ public class GetFarms
         string Address,
         string Description,
         decimal Rating,
-        IEnumerable<string> FarmImages
+        IEnumerable<ImageResponse> FarmImages
     )
     {
 
@@ -36,7 +48,7 @@ public class GetFarms
                 Address: farm.Address,
                 Description: farm.Description,
                 Rating: farm.Rating,
-                FarmImages: farm.FarmImages.Select(farmImage => farmImage.Url)
+                FarmImages: farm.FarmImages.Select(i => ImageResponse.FromEntity(i))
             );
     }
 
