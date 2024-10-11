@@ -48,7 +48,8 @@ public class UpdateOrderStatus
         {
             app.MapPatch("api/orders/{id}/status", Handle)
                 .WithTags("Orders")
-                .WithMetadata(new SwaggerOperationAttribute("Update Order Status"));
+                .WithMetadata(new SwaggerOperationAttribute("Update Order Status"))
+                .RequireAuthorization();
         }
 
         public static async Task<IResult> Handle(
