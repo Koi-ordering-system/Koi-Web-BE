@@ -11,7 +11,8 @@ public class UpdateAuditableInterceptor : SaveChangesInterceptor
     public override ValueTask<InterceptionResult<int>> SavingChangesAsync(
         DbContextEventData eventData,
         InterceptionResult<int> result,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
         if (eventData.Context is not null)
         {
@@ -19,31 +20,28 @@ public class UpdateAuditableInterceptor : SaveChangesInterceptor
         }
         return base.SavingChangesAsync(eventData, result, cancellationToken);
     }
-    
+
     private static void UpdateAuditableEntities(DbContext context)
     {
-        DateTime utcNow = DateTime.UtcNow;
-        List<EntityEntry<BaseAuditableEntity>> entities = context.ChangeTracker.Entries<BaseAuditableEntity>().ToList();
+        DateTimeOffset utcNow = DateTimeOffset.UtcNow;
+        List<EntityEntry<BaseAuditableEntity>> entities = context
+            .ChangeTracker.Entries<BaseAuditableEntity>()
+            .ToList();
 
         foreach (EntityEntry<BaseAuditableEntity> entry in entities)
         {
             if (entry.State == EntityState.Added)
             {
-                SetCurrentPropertyValue(
-                    entry, nameof(BaseAuditableEntity.CreatedAt), utcNow);
+                SetCurrentPropertyValue(entry, nameof(BaseAuditableEntity.CreatedAt), utcNow);
             }
 
             if (entry.State == EntityState.Modified)
             {
-                SetCurrentPropertyValue(
-                    entry, nameof(BaseAuditableEntity.UpdatedAt), utcNow);
+                SetCurrentPropertyValue(entry, nameof(BaseAuditableEntity.UpdatedAt), utcNow);
             }
         }
 
-        static void SetCurrentPropertyValue<T>(
-            EntityEntry entry,
-            string propertyName,
-            T value) =>
+        static void SetCurrentPropertyValue<T>(EntityEntry entry, string propertyName, T value) =>
             entry.Property(propertyName).CurrentValue = value;
     }
 }
