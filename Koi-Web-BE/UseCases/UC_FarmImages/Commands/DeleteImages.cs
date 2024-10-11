@@ -24,9 +24,12 @@ public class DeleteImages
             if (!currentUser.User!.IsAdmin())
                 return Result<Response>.Fail(new ForbiddenException("The current user is not an admin"));
             //check request images are existed
-            var deleteImages = context.FarmImages.Where(fi => request.ImageIds.Contains(fi.Id));
+            var deleteImages = context.FarmImages
+                .AsNoTracking()
+                .Where(fi => request.ImageIds.Contains(fi.Id) && fi.FarmId == request.FarmId);
             if (deleteImages.Count() != request.ImageIds.Count())
                 return Result<Response>.Fail(new NotFoundException("request contain file id does not exist"));
+
             //delete files from database
             context.FarmImages.RemoveRange(deleteImages);
             // Remove farm images in cloudinary
