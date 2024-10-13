@@ -38,7 +38,7 @@ public class UpdateKoi
             CancellationToken cancellationToken = default)
         {
             await sender.Send(request, cancellationToken);
-            return Results.Created();
+            return Results.NoContent();
         }
     }
     
