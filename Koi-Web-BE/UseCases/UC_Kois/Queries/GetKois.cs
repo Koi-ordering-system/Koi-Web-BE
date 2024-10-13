@@ -69,8 +69,7 @@ public abstract class GetKois
         {
             app.MapGet("/api/kois", Handle)
                 .WithTags("Kois")
-                .WithMetadata(new SwaggerOperationAttribute("Get all kois"))
-                .RequireAuthorization();
+                .WithMetadata(new SwaggerOperationAttribute("Get all kois"));
         }
 
         public static async Task<IResult> Handle(ISender sender,
