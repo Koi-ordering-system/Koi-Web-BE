@@ -17,4 +17,5 @@ public class User : BaseEntity
     public IList<Review> Reviews { get; set; } = [];
 
     public bool IsAdmin() => Role.Equals(RoleEnum.Admin);
+    public bool IsManager() => Role.Equals(RoleEnum.Manager);
 }
