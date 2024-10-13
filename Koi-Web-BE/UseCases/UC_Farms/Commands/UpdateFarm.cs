@@ -30,9 +30,9 @@ public class UpdateFarm
     {
         public async Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)
         {
-            // Check if the current user is an admin
-            if (!currentUser.User!.IsAdmin())
-                return Result<Response>.Fail(new ForbiddenException("The current user is not an admin"));
+            // Check if the current user is an admin or manager
+            if (!currentUser.User!.IsAdmin() && !currentUser.User!.IsManager())
+                return Result<Response>.Fail(new ForbiddenException("The current user is not an admin or manager"));
             // Get the farm entity
             Farm? updatingFarm = await context.Farms
                 .Include(farm => farm.FarmImages)
