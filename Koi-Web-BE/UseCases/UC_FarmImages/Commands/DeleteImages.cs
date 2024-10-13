@@ -48,7 +48,7 @@ public class DeleteImages
     {
         public static void DefineEndpoints(IEndpointRouteBuilder app)
         {
-            app.MapDelete("", Handle)
+            app.MapDelete("api/farm-images", Handle)
             .WithTags("FarmImages")
             .WithMetadata(new SwaggerOperationAttribute("Delete Farm Images"))
             .RequireAuthorization();
