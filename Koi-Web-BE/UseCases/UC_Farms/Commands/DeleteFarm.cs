@@ -21,9 +21,9 @@ public class DeleteFarm
     {
         public async Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)
         {
-            //check if user has permission to delete
-            if (!currentUser.User!.IsAdmin())
-                return Result<Response>.Fail(new ForbiddenException("The current user is not an admin"));
+            // Check if the current user is an admin or manager
+            if (!currentUser.User!.IsAdmin() && !currentUser.User!.IsManager())
+                return Result<Response>.Fail(new ForbiddenException("The current user is not an admin or manager"));
             // Get the farm entity
             Farm? deletingFarm = await context.Farms
                 .Include(farm => farm.FarmImages)
