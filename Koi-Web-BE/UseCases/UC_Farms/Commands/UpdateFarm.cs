@@ -7,6 +7,7 @@ using Koi_Web_BE.Models.Primitives;
 using Koi_Web_BE.Utils;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.OutputCaching;
 using Microsoft.EntityFrameworkCore;
 using Swashbuckle.AspNetCore.Annotations;
 
@@ -25,7 +26,7 @@ public class UpdateFarm
 
     public record Response();
 
-    public class Handler(IApplicationDbContext context, CurrentUser currentUser, IImageService imageService) : IRequestHandler<Command, Result<Response>>
+    public class Handler(IApplicationDbContext context, CurrentUser currentUser, IImageService imageService, IOutputCacheStore store) : IRequestHandler<Command, Result<Response>>
     {
         public async Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)
         {
@@ -53,6 +54,8 @@ public class UpdateFarm
             context.FarmImages.AddRange(await Task.WhenAll(uploadTasks));
             // Save changes to the database
             await context.SaveChangesAsync(cancellationToken);
+            // clear cache
+            await store.EvictByTagAsync("Farms", cancellationToken);
             return Result<Response>.Succeed(null!);
         }
     }
@@ -70,7 +73,7 @@ public class UpdateFarm
 
         public static async Task<IResult> Handle(
             ISender sender,
-            [FromForm] Guid id,
+            [FromRoute] Guid id,
             [FromForm] string name,
             [FromForm] string owner,
             [FromForm] string address,

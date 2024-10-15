@@ -38,7 +38,7 @@ public class GetSpeciesById
             app.MapGet("api/species/{id}", Handle)
             .WithTags("Species")
             .WithMetadata(new SwaggerOperationAttribute("Get a Species"))
-            .RequireAuthorization();
+            .CacheOutput(b => b.Tag("Species"));
         }
         public static async Task<IResult> Handle(ISender sender, Guid id, CancellationToken cancellationToken = default)
         {

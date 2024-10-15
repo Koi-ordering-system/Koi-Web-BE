@@ -19,6 +19,13 @@ builder.Services.AddMediatR(option =>
 builder.Services.AddScoped<IApplicationDbContext, ApplicationDbContext>();
 builder.Services.AddScoped<CurrentUser>();
 builder.Services.AddScoped<AuthMiddleware>();
+builder.Services.AddOutputCache(builder =>
+{
+    builder.AddPolicy("default", policy =>
+    {
+        policy.Expire(TimeSpan.FromSeconds(10));
+    });
+});
 builder.Services.AddSwaggerGen(option =>
 {
     option.EnableAnnotations();
@@ -80,12 +87,17 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI(option => option.DisplayRequestDuration());
     app.MigrateDatabase<ApplicationDbContext>(async (option, _) => await option.Seed());
 }
-app.MigrateDatabase<ApplicationDbContext>(async (_, _) => await Task.Delay(0));
+else
+{
+    app.MigrateDatabase<ApplicationDbContext>(async (_, _) => await Task.Delay(0));
+}
+app.UseAuthentication();
+app.UseAuthorization();
+app.UseOutputCache();
 app.UseMiddleware<AuthMiddleware>();
 app.UseMiddleware<ExceptionMiddleware>();
 
 app.UseHttpsRedirection();
 
 app.UseMinimalEndpoints<Program>();
-
 app.Run();

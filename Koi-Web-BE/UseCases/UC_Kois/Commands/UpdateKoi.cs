@@ -4,6 +4,7 @@ using Koi_Web_BE.Exceptions;
 using Koi_Web_BE.Models.Entities;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.OutputCaching;
 using Swashbuckle.AspNetCore.Annotations;
 
 namespace Koi_Web_BE.UseCases.UC_Kois.Commands;
@@ -41,7 +42,7 @@ public class UpdateKoi
             return Results.NoContent();
         }
     }
-    
+
     public class Command : IRequest
     {
         public Guid Id { get; set; }
@@ -53,7 +54,7 @@ public class UpdateKoi
         public decimal Price { get; set; } = 0;
     }
 
-    public class Handler(IApplicationDbContext dbContext) : IRequestHandler<Command>
+    public class Handler(IApplicationDbContext dbContext, IOutputCacheStore store) : IRequestHandler<Command>
     {
         public async Task Handle(Command request, CancellationToken cancellationToken)
         {
@@ -69,6 +70,7 @@ public class UpdateKoi
             koi.IsMale = request.IsMale;
             koi.Price = request.Price;
             await dbContext.SaveChangesAsync(cancellationToken);
+            await store.EvictByTagAsync("Kois", cancellationToken);
         }
     }
 }

@@ -14,5 +14,5 @@ public class OrderGenerator
             .RuleFor(e => e.Price, f => f.Random.Decimal(0,1000))
             .RuleFor(e=>e.IsPaid,f=>f.Random.Bool())
             .RuleFor(e=>e.Status,f=>f.Random.Bool() ? f.PickRandom<OrderStatusEnum>() : null!)
-            .Generate(50)];
+            .Generate(50).DistinctBy(o=>new {o.UserId,o.FarmId})];
 }
