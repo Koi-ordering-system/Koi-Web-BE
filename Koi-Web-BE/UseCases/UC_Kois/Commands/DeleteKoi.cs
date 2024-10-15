@@ -4,6 +4,7 @@ using Koi_Web_BE.Exceptions;
 using Koi_Web_BE.Models.Entities;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.OutputCaching;
 using Swashbuckle.AspNetCore.Annotations;
 
 namespace Koi_Web_BE.UseCases.UC_Kois.Commands;
@@ -31,8 +32,8 @@ public class DeleteKoi
     }
 
     public record Command(Guid KoiId) : IRequest;
-    
-    public class Handler(IApplicationDbContext dbContext) : IRequestHandler<Command>
+
+    public class Handler(IApplicationDbContext dbContext, IOutputCacheStore store) : IRequestHandler<Command>
     {
         public async Task Handle(Command request, CancellationToken cancellationToken)
         {
@@ -41,10 +42,11 @@ public class DeleteKoi
             {
                 throw new NotFoundException("Koi not found");
             }
-            
+
             dbContext.Kois.Remove(koi);
-            
+
             await dbContext.SaveChangesAsync(cancellationToken);
+            await store.EvictByTagAsync("Kois", cancellationToken);
         }
     }
 }

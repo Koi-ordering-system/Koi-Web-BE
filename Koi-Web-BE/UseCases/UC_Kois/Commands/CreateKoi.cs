@@ -3,6 +3,7 @@ using Koi_Web_BE.Endpoints.Internal;
 using Koi_Web_BE.Models.Entities;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.OutputCaching;
 using Swashbuckle.AspNetCore.Annotations;
 
 namespace Koi_Web_BE.UseCases.UC_Kois.Commands;
@@ -19,8 +20,8 @@ public abstract class CreateKoi
         public bool IsMale { get; set; } = true;
         public decimal Price { get; set; } = 0;
     }
-    
-    public class Handler(IApplicationDbContext dbContext) : IRequestHandler<Command>
+
+    public class Handler(IApplicationDbContext dbContext, IOutputCacheStore store) : IRequestHandler<Command>
     {
         public async Task Handle(Command request, CancellationToken cancellationToken)
         {
@@ -36,9 +37,10 @@ public abstract class CreateKoi
             };
             dbContext.Kois.Add(koi);
             await dbContext.SaveChangesAsync(cancellationToken);
+            await store.EvictByTagAsync("Kois", cancellationToken);
         }
     }
-    
+
     public class Endpoint : IEndpoints
     {
         public static void DefineEndpoints(IEndpointRouteBuilder app)
