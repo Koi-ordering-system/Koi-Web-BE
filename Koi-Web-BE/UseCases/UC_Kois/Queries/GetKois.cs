@@ -70,7 +70,7 @@ public abstract class GetKois
             app.MapGet("/api/kois", Handle)
                 .WithTags("Kois")
                 .WithMetadata(new SwaggerOperationAttribute("Get all kois"))
-                .CacheOutput();
+                .CacheOutput(b => b.Tag("Kois"));
         }
 
         public static async Task<IResult> Handle(ISender sender,
