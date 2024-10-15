@@ -8,6 +8,7 @@ using Koi_Web_BE.Models.Primitives;
 using Koi_Web_BE.Utils;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.OutputCaching;
 using Swashbuckle.AspNetCore.Annotations;
 
 namespace Koi_Web_BE.UseCases.UC_Farms.Commands;
@@ -35,7 +36,7 @@ public class CreateFarm
             );
     }
 
-    public class Handler(IApplicationDbContext context, CurrentUser currentUser, IImageService imageService) : IRequestHandler<Command, Result<Response>>
+    public class Handler(IApplicationDbContext context, CurrentUser currentUser, IImageService imageService, IOutputCacheStore store) : IRequestHandler<Command, Result<Response>>
     {
         public async Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)
         {
@@ -66,6 +67,8 @@ public class CreateFarm
             // Add to database
             context.Farms.Add(addingFarm);
             await context.SaveChangesAsync(cancellationToken);
+            // clear cache
+            await store.EvictByTagAsync("Farms", cancellationToken);
             // Return result
             return Result<Response>.Succeed(Response.FromEntity(addingFarm));
         }
