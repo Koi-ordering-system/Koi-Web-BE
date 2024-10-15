@@ -99,16 +99,16 @@ public class GetFarms
         }
 
         public static async Task<IResult> Handle(ISender sender,
-            [FromQuery] int page = 1,
-            [FromQuery] int size = 10,
+            [FromQuery] int pageIndex = 1,
+            [FromQuery] int pageSize = 10,
             [FromQuery] string sortBy = "",
             [FromQuery] string sortOrder = "",
             [FromQuery] string search = "",
             CancellationToken cancellationToken = default)
         {
             var response = await sender.Send(new Query(
-                page,
-                size,
+                pageIndex,
+                pageSize,
                 sortBy.ToLower(),
                 sortOrder,
                 search
