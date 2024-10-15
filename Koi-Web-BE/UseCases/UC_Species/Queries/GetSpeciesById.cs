@@ -13,10 +13,15 @@ public class GetSpeciesById
 {
     public record Query(Guid Id) : IRequest<Result<Response>>;
 
-    public record Response(Guid Id, string Name)
+    public record Response(Guid Id, string Name,
+        string Description,
+        int YearOfDiscovery,
+        string DiscoveredBy,
+        DateTimeOffset CreatedAt
+    )
     {
         public static Response FromEntity(Species species)
-            => new(species.Id, species.Name);
+            => new(species.Id, species.Name, species.Description, species.YearOfDiscovery, species.DiscoveredBy, species.CreatedAt);
     }
 
     public class Handler(IApplicationDbContext context) : IRequestHandler<Query, Result<Response>>
