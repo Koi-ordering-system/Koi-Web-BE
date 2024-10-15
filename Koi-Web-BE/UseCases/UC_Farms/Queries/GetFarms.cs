@@ -64,7 +64,7 @@ public class GetFarms
             IQueryable<Farm> query = context.Farms
                 .AsNoTracking()
                 .Include(f => f.FarmImages)
-                .Where(f => f.Name.ToLower().Contains(request.Name.ToLower()));
+                .Where(f => f.Name.Trim().ToLower().Contains(request.Name.Trim().ToLower()));
 
             //sort
             Expression<Func<Farm, object>> keySelector = request.SortBy switch
