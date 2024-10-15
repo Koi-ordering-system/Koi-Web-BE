@@ -21,7 +21,6 @@ public class UpdateFarm
         string Owner,
         string Address,
         string Description,
-        decimal Rating,
         IFormFileCollection FarmImages
     ) : IRequest<Result<Response>>;
 
@@ -41,7 +40,7 @@ public class UpdateFarm
             if (updatingFarm == null)
                 return Result<Response>.Fail(new NotFoundException("Farm not found"));
             // Update the farm entity
-            updatingFarm.Update(request.Name, request.Owner, request.Address, request.Description, request.Rating);
+            updatingFarm.Update(request.Name, request.Owner, request.Address, request.Description);
             // Upload images to Cloudinary and add URLs to the farm
             var uploadTasks = request.FarmImages.Select(async image =>
             {
@@ -79,11 +78,10 @@ public class UpdateFarm
             [FromForm] string owner,
             [FromForm] string address,
             [FromForm] string description,
-            [FromForm] decimal rating,
             IFormFileCollection farmImages,
             CancellationToken cancellationToken = default)
         {
-            Result<Response> result = await sender.Send(new Command(id, name, owner, address, description, rating, farmImages), cancellationToken);
+            Result<Response> result = await sender.Send(new Command(id, name, owner, address, description, farmImages), cancellationToken);
             if (!result.Succeeded)
                 return Results.BadRequest(result);
             return Results.NoContent();
@@ -98,7 +96,6 @@ public class UpdateFarm
             RuleFor(x => x.Owner).NotEmpty().WithMessage("Owner is required.");
             RuleFor(x => x.Address).NotEmpty().WithMessage("Address is required.");
             RuleFor(x => x.Description).NotEmpty().WithMessage("Description is required.");
-            RuleFor(x => x.Rating).InclusiveBetween(0, 5).WithMessage("Rating must be between 0 and 5.");
             RuleFor(x => x.FarmImages)
                 .Must(HaveValidImageSizes).WithMessage("All images must be less than 10MB.");
         }
