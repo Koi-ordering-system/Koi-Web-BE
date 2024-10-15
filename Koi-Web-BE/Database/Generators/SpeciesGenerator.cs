@@ -8,7 +8,13 @@ public class SpeciesGenerator
     public static Species[] Generate()
         => [.. new Faker<Species>()
             .ApplyEntitesRules()
+            .UseDateTimeReference(DateTime.UtcNow)
             .RuleFor(e=>e.Name,f=>f.PickRandom(koiVarieties))
+            .RuleFor(e=>e.Description,f=>f.Lorem.Sentence())
+            .RuleFor(e=>e.YearOfDiscovery,f=>f.Random.Number(0,2024))
+            .RuleFor(e=>e.DiscoveredBy,f=>f.Name.FullName())
+            .RuleFor(e=>e.CreatedAt,f=>f.Date.Past())
+            .RuleFor(e=>e.UpdatedAt,f=>f.Random.Bool() ? f.Date.Past() : null!)
             .Generate(50).DistinctBy(s=>s.Name)];
 
     private static readonly string[] koiVarieties = [
