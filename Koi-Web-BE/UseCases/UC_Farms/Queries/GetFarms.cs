@@ -1,21 +1,26 @@
 using Koi_Web_BE.Database;
 using Koi_Web_BE.Endpoints.Internal;
+using Koi_Web_BE.Extensions;
+using Koi_Web_BE.Models;
 using Koi_Web_BE.Models.Entities;
 using Koi_Web_BE.Models.Primitives;
 using MediatR;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Swashbuckle.AspNetCore.Annotations;
+using System.Linq.Expressions;
 
 namespace Koi_Web_BE.UseCases.UC_Farms.Queries;
 
 public class GetFarms
 {
     public record Query(
-        int PageIndex,
-        int PageSize,
-        bool AscByRating,
+        int Page,
+        int Size,
+        string SortBy,
+        string SortOrder,
         string Name
-    ) : IRequest<Result<Response>>;
+    ) : IRequest<PaginatedList<FarmResponse>>;
 
     public record ImageResponse(
         Guid Id,
@@ -52,43 +57,34 @@ public class GetFarms
             );
     }
 
-    public record Response(
-        int PageIndex,
-        int PageSize,
-        int TotalPages,
-        IEnumerable<FarmResponse> Farms
-    );
-
-    public class Handler(IApplicationDbContext context) : IRequestHandler<Query, Result<Response>>
+    public class Handler(IApplicationDbContext context) : IRequestHandler<Query, PaginatedList<FarmResponse>>
     {
-        public async Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
+        public async Task<PaginatedList<FarmResponse>> Handle(Query request, CancellationToken cancellationToken)
         {
             IQueryable<Farm> query = context.Farms
                 .AsNoTracking()
                 .Include(f => f.FarmImages)
                 .Where(f => f.Name.ToLower().Contains(request.Name.ToLower()));
-            //calculate total pages
-            var totalFarms = await query.CountAsync(cancellationToken);
-            var totalPages = (int)Math.Ceiling(totalFarms / (double)request.PageSize);
 
             //sort
-            if (request.AscByRating)
-                query = query.OrderBy(f => f.Rating);
-            else
-                query = query.OrderByDescending(f => f.Rating);
-            //map to response detail
-            IEnumerable<FarmResponse> farms = await query
-                .Skip((request.PageIndex - 1) * request.PageSize)
-                .Take(request.PageSize)
-                .Select(f => FarmResponse.FromEntity(f))
-                .ToListAsync(cancellationToken);
-            //return response
-            return Result<Response>.Succeed(new Response(
-                PageIndex: request.PageIndex,
-                PageSize: request.PageSize,
-                TotalPages: totalPages,
-                Farms: farms
-            ));
+            Expression<Func<Farm, object>> keySelector = request.SortBy switch
+            {
+                "name" => x => x.Name,
+                "description" => x => x.Description,
+                "Owner" => x => x.Owner,
+                "address" => x => x.Address,
+                "rating" => x => x.Rating,
+                _ => x => x.Name,
+            };
+
+
+            return await query.ListPaginateWithOrderAsync(
+                request.Page,
+                request.Size,
+                keySelector,
+                request.SortOrder,
+                FarmResponse.FromEntity
+            );
         }
     }
 
@@ -103,14 +99,21 @@ public class GetFarms
         }
 
         public static async Task<IResult> Handle(ISender sender,
-            int pageIndex = 1,
-            int pageSize = 10,
-            bool ascByRating = false,
-            string search = "",
+            [FromQuery] int page = 1,
+            [FromQuery] int size = 10,
+            [FromQuery] string sortBy = "",
+            [FromQuery] string sortOrder = "",
+            [FromQuery] string search = "",
             CancellationToken cancellationToken = default)
         {
-            Result<Response> response = await sender.Send(new Query(pageIndex, pageSize, ascByRating, search), cancellationToken);
-            return Results.Ok(response);
+            var response = await sender.Send(new Query(
+                page,
+                size,
+                sortBy.ToLower(),
+                sortOrder,
+                search
+            ), cancellationToken);
+            return Results.Ok(Result<PaginatedList<FarmResponse>>.Succeed(response));
         }
     }
 }
