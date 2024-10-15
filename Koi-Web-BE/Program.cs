@@ -91,6 +91,7 @@ else
 {
     app.MigrateDatabase<ApplicationDbContext>(async (_, _) => await Task.Delay(0));
 }
+app.UseCors();
 app.UseAuthentication();
 app.UseAuthorization();
 app.UseOutputCache();
