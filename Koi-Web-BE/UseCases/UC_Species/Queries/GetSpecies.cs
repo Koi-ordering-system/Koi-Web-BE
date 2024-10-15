@@ -65,7 +65,7 @@ public class GetSpecies
             app.MapGet("/api/species", Handle)
             .WithTags("Species")
             .WithMetadata(new SwaggerOperationAttribute("Get all Species"))
-            .RequireAuthorization();
+            .CacheOutput(b => b.Tag("Species"));
         }
         public static async Task<IResult> Handle(ISender sender, string Keyword = "", int PageIndex = 1, int PageSize = 10, CancellationToken cancellationToken = default)
         {
