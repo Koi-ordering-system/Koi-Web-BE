@@ -54,7 +54,8 @@ public class GetKoiById
         {
             app.MapGet("/api/kois/{id:guid}", Handle)
                 .WithTags("Kois")
-                .WithMetadata(new SwaggerOperationAttribute("Get a Koi"));
+                .WithMetadata(new SwaggerOperationAttribute("Get a Koi"))
+                .CacheOutput(b => b.Tag("Kois"));
         }
 
         private static async Task<IResult> Handle(ISender sender, [FromRoute] Guid id, CancellationToken cancellationToken = default)

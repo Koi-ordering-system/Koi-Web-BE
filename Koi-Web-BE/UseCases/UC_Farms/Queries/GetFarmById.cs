@@ -58,7 +58,7 @@ public class GetFarmById
             app.MapGet("api/farms/{id}", Handle)
                 .WithTags("Farms")
                 .WithMetadata(new SwaggerOperationAttribute("Get a Farm"))
-                .RequireAuthorization();
+                .CacheOutput(b => b.Tag("Farms"));
         }
 
         public static async Task<IResult> Handle(ISender sender, Guid id, CancellationToken cancellationToken = default)

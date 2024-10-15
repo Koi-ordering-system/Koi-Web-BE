@@ -98,7 +98,8 @@ public class GetFarms
         {
             app.MapGet("/api/farms", Handle)
                 .WithTags("Farms")
-                .WithMetadata(new SwaggerOperationAttribute("Get all Farms"));
+                .WithMetadata(new SwaggerOperationAttribute("Get all Farms"))
+                .CacheOutput(b => b.Tag("Farms"));
         }
 
         public static async Task<IResult> Handle(ISender sender,

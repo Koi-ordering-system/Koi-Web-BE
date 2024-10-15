@@ -5,6 +5,7 @@ using Koi_Web_BE.Models.Entities;
 using Koi_Web_BE.Models.Primitives;
 using Koi_Web_BE.Utils;
 using MediatR;
+using Microsoft.AspNetCore.OutputCaching;
 using Microsoft.EntityFrameworkCore;
 using Swashbuckle.AspNetCore.Annotations;
 using System.Net;
@@ -17,7 +18,7 @@ public class DeleteFarm
 
     public record Response();
 
-    public class Handler(IApplicationDbContext context, CurrentUser currentUser, IImageService imageService) : IRequestHandler<Command, Result<Response>>
+    public class Handler(IApplicationDbContext context, CurrentUser currentUser, IImageService imageService, IOutputCacheStore store) : IRequestHandler<Command, Result<Response>>
     {
         public async Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)
         {
@@ -41,6 +42,8 @@ public class DeleteFarm
             // Remove the farm entity
             context.Farms.Remove(deletingFarm);
             await context.SaveChangesAsync(cancellationToken);
+            // clear cache
+            await store.EvictByTagAsync("Farms", cancellationToken);
             return Result<Response>.Succeed(null!);
         }
     }
