@@ -61,9 +61,9 @@ public class GetSpecies
             .WithMetadata(new SwaggerOperationAttribute("Get all Species"))
             .CacheOutput(b => b.Tag("Species"));
         }
-        public static async Task<IResult> Handle(ISender sender, string Keyword = "", int PageIndex = 1, int PageSize = 10, CancellationToken cancellationToken = default)
+        public static async Task<IResult> Handle(ISender sender, string keyword = "", int pageIndex = 1, int pageSize = 10, CancellationToken cancellationToken = default)
         {
-            Result<PaginatedList<Response>> response = await sender.Send(new Query(Keyword, PageIndex, PageSize), cancellationToken);
+            Result<PaginatedList<Response>> response = await sender.Send(new Query(keyword, pageIndex, pageSize), cancellationToken);
             if (!response.Succeeded) return Results.NotFound(response);
             return Results.Ok(response);
         }
