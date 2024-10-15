@@ -19,7 +19,6 @@ public class CreateFarm
         string Owner,
         string Address,
         string Description,
-        decimal Rating,
         IFormFileCollection FarmImages
     ) : IRequest<Result<Response>>;
 
@@ -49,7 +48,6 @@ public class CreateFarm
                 Owner = request.Owner,
                 Address = request.Address,
                 Description = request.Description,
-                Rating = request.Rating
             };
             // Upload images to Cloudinary and add URLs to the farm
             var uploadTasks = request.FarmImages.Select(async image =>
@@ -87,7 +85,6 @@ public class CreateFarm
             [FromForm] string owner,
             [FromForm] string address,
             [FromForm] string description,
-            [FromForm] decimal rating,
             IFormFileCollection farmImages,
             CancellationToken cancellationToken = default)
         {
@@ -96,7 +93,6 @@ public class CreateFarm
                 Owner: owner,
                 Address: address,
                 Description: description,
-                Rating: rating,
                 FarmImages: farmImages), cancellationToken);
             if (!result.Succeeded)
                 return Results.BadRequest(result);
@@ -112,7 +108,6 @@ public class CreateFarm
             RuleFor(x => x.Owner).NotEmpty().WithMessage("Owner is required.");
             RuleFor(x => x.Address).NotEmpty().WithMessage("Address is required.");
             RuleFor(x => x.Description).NotEmpty().WithMessage("Description is required.");
-            RuleFor(x => x.Rating).InclusiveBetween(0, 5).WithMessage("Rating must be between 0 and 5.");
             RuleFor(x => x.FarmImages)
                 .Must(HaveValidImageSizes).WithMessage("All images must be less than 10MB.");
         }
