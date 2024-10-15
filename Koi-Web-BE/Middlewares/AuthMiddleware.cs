@@ -28,50 +28,25 @@ public class AuthMiddleware(IApplicationDbContext appContext) : IMiddleware
             await next.Invoke(context);
             return;
         }
-        var idClaim = claims.FirstOrDefault(c => c.Type.Equals("id", StringComparison.InvariantCultureIgnoreCase));
-        var usernameClaim = claims.FirstOrDefault(c => c.Type.Equals("username", StringComparison.InvariantCultureIgnoreCase));
-        var emailClaim = claims.FirstOrDefault(c => c.Type.Equals("email", StringComparison.InvariantCultureIgnoreCase));
-        var phoneNumberClaim = claims.FirstOrDefault(c => c.Type.Equals("phonenumber", StringComparison.InvariantCultureIgnoreCase));
-        var imageUrlClaim = claims.FirstOrDefault(c => c.Type.Equals("imageurl", StringComparison.InvariantCultureIgnoreCase));
-
+        var idClaim = claims.FirstOrDefault(c => c.Type.Equals("sub", StringComparison.InvariantCultureIgnoreCase));
         string? id = idClaim?.Value ?? string.Empty;
-        string? username = usernameClaim?.Value ?? string.Empty;
-        string? email = emailClaim?.Value ?? string.Empty;
-        string? phoneNumber = phoneNumberClaim?.Value ?? string.Empty;
-        string? imageUrl = imageUrlClaim?.Value ?? string.Empty;
         User? checkingUser = await appContext.Users.SingleOrDefaultAsync(u => u.Id.Equals(id));
         if (checkingUser is null)
         {
             checkingUser = new()
             {
                 Id = id,
-                Username = username,
-                PhoneNumber = phoneNumber,
-                AvatarUrl = imageUrl,
-                Email = email,
-                Role = RoleEnum.Customer,
+                Username = "ADMIN",
+                PhoneNumber = "0938386853",
+                AvatarUrl = "https://img.icons8.com/color/48/000000/administrator-male.png",
+                Email = "CjT5A@example.com",
+                Role = RoleEnum.Admin,
                 Carts = new() { UserId = id }
             };
             appContext.Users.Add(checkingUser);
             await appContext.SaveChangesAsync(cancellationToken: default);
         }
         // then checking user is not null
-        else
-        {
-            if (
-                checkingUser.Username != username
-                || checkingUser.Email != email
-                || checkingUser.PhoneNumber != phoneNumber
-                || checkingUser.AvatarUrl != imageUrl
-            )
-            {
-                checkingUser.Username = username;
-                checkingUser.Email = email;
-                checkingUser.PhoneNumber = phoneNumber;
-                checkingUser.AvatarUrl = imageUrl;
-                await appContext.SaveChangesAsync(cancellationToken: default);
-            }
-        }
         CurrentUser currentUser = context.RequestServices.GetRequiredService<CurrentUser>();
         currentUser.User = checkingUser;
         await next.Invoke(context);
