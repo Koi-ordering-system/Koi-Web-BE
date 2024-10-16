@@ -1,6 +1,7 @@
 using Koi_Web_BE.Database;
 using Koi_Web_BE.Endpoints.Internal;
 using Koi_Web_BE.Models.Entities;
+using Koi_Web_BE.Utils;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OutputCaching;
@@ -19,9 +20,10 @@ public abstract class CreateKoi
         public decimal MaxSize { get; set; } = 0;
         public bool IsMale { get; set; } = true;
         public decimal Price { get; set; } = 0;
+        public IFormFileCollection KoiImages { get; set; }
     }
 
-    public class Handler(IApplicationDbContext dbContext, IOutputCacheStore store) : IRequestHandler<Command>
+    public class Handler(IApplicationDbContext dbContext, IOutputCacheStore store, IImageService imageService) : IRequestHandler<Command>
     {
         public async Task Handle(Command request, CancellationToken cancellationToken)
         {
@@ -36,6 +38,18 @@ public abstract class CreateKoi
                 Price = request.Price,
             };
             dbContext.Kois.Add(koi);
+            var uploadTasks = request.KoiImages.Select(async image =>
+            {
+                var imageUrl = await imageService.UploadImageAsync(image, image.FileName, "farms");
+                return new KoiImage
+                {
+                    KoiId = koi.Id,
+                    Url = imageUrl,
+                };
+            });
+            var koiImages = await Task.WhenAll(uploadTasks);
+            ((List<KoiImage>)koi.Images).AddRange(koiImages);
+
             await dbContext.SaveChangesAsync(cancellationToken);
             await store.EvictByTagAsync("Kois", cancellationToken);
         }
@@ -54,10 +68,26 @@ public abstract class CreateKoi
 
         private static async Task<IResult> Handle(
             ISender sender,
-            [FromBody] Command request,
+            [FromForm] Guid speciesId,
+            [FromForm] string name,
+            [FromForm] string description,
+            [FromForm] decimal minSize,
+            [FromForm] decimal maxSize,
+            [FromForm] bool isMale,
+            [FromForm] decimal price,
+            [FromForm] IFormFileCollection koiImages,
             CancellationToken cancellationToken = default)
         {
-            await sender.Send(request, cancellationToken);
+            await sender.Send(new Command
+            {
+                Name = name,
+                SpeciesId = speciesId,
+                Description = description,
+                Price = price,
+                IsMale = isMale,
+                MaxSize = maxSize,
+                MinSize = minSize,
+            }, cancellationToken);
             return Results.Created();
         }
     }

@@ -20,6 +20,7 @@ public abstract class GetKois
         public int? Size { get; init; }
         public string? SortBy { get; init; }
         public string? SortOrder { get; init; }
+        public string? Search { get; init; }
     }
 
     public class ResponseItem
@@ -31,13 +32,22 @@ public abstract class GetKois
         public decimal MaxSize { get; set; } = 0;
         public bool IsMale { get; set; } = true;
         public decimal Price { get; set; } = 0;
+        public ICollection<string> ImageUrls { get; set; } = new List<string>();
     }
 
     public class Handler(IApplicationDbContext context) : IRequestHandler<Query, PaginatedList<ResponseItem>>
     {
         public async Task<PaginatedList<ResponseItem>> Handle(Query request, CancellationToken cancellationToken)
         {
-            var query = context.Kois.Include(x => x.FarmKois).AsNoTracking();
+            var query = context.Kois
+                .Include(x => x.FarmKois)
+                .Include(x => x.Images)
+                .AsNoTracking();
+
+            if (!string.IsNullOrEmpty(request.Search))
+            {
+                query = query.Where(x => EF.Functions.ILike(x.Name, $"%{request.Search}%"));
+            }
             Expression<Func<Koi, object>> keySelector = request.SortBy switch
             {
                 "name" => x => x.Name,
@@ -59,6 +69,7 @@ public abstract class GetKois
                     IsMale = x.IsMale,
                     MaxSize = x.MaxSize,
                     MinSize = x.MinSize,
+                    ImageUrls = x.Images.Select(y => y.Url).ToList()
                 });
         }
     }
@@ -78,6 +89,7 @@ public abstract class GetKois
             [FromQuery] int? pageSize,
             [FromQuery] string? sortBy,
             [FromQuery] string? sortOrder,
+            [FromQuery] string? search,
             CancellationToken cancellationToken = default)
         {
             var response = await sender.Send(new Query
@@ -86,6 +98,7 @@ public abstract class GetKois
                 Size = pageSize,
                 SortBy = sortBy,
                 SortOrder = sortOrder,
+                Search = search,
             }, cancellationToken);
             return Results.Ok(Result<PaginatedList<ResponseItem>>.Succeed(response));
         }
