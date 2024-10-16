@@ -5,6 +5,7 @@ using Koi_Web_BE.Models.Entities;
 using Koi_Web_BE.Models.Primitives;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.OutputCaching;
 using Microsoft.EntityFrameworkCore;
 using Swashbuckle.AspNetCore.Annotations;
 
@@ -17,10 +18,10 @@ namespace Koi_Web_BE.UseCases.UC_Feedbacks.Commands
         public class CreateFeedbackRequest
         {
             public Guid FarmId { get; set; }
-            public int Rating { get; set; }
-            public string Content { get; set; }
+            public int Rating { get; set; } = 0;
+            public string Content { get; set; } = string.Empty;
         };
-        
+
         public record Response(
             Guid Id,
             Guid FarmId,
@@ -31,12 +32,14 @@ namespace Koi_Web_BE.UseCases.UC_Feedbacks.Commands
             public static Response FromEntity(Review review)
                 => new(review.Id, review.FarmId, review.UserId, review.Rating, review.Content);
         };
-        
-        public class Handler(IApplicationDbContext context, CurrentUser currentUser) : IRequestHandler<Command, Result<Response>>
+
+        public class Handler(IApplicationDbContext context, CurrentUser currentUser, IOutputCacheStore store) : IRequestHandler<Command, Result<Response>>
         {
             public async Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)
             {
-                var existedReview = await context.Reviews.AnyAsync(r => r.FarmId == request.FarmId && r.UserId.Equals(currentUser.User!.Id), cancellationToken);
+                var existedReview = await context.Reviews
+                    .AsNoTracking()
+                    .AnyAsync(r => r.FarmId == request.FarmId && r.UserId.Equals(currentUser.User!.Id), cancellationToken);
                 if (existedReview)
                     return Result<Response>.Fail(new InvalidOperationException("Already exists!"));
                 Review review = new()
@@ -48,6 +51,7 @@ namespace Koi_Web_BE.UseCases.UC_Feedbacks.Commands
                 };
                 context.Reviews.Add(review);
                 await context.SaveChangesAsync(cancellationToken);
+                await store.EvictByTagAsync("Feedbacks", cancellationToken);
                 var newReview = await context.Reviews.Where(r => r.UserId == review.UserId && r.FarmId == review.FarmId).SingleOrDefaultAsync(cancellationToken);
                 return Result<Response>.Succeed(Response.FromEntity(newReview!));
             }
@@ -73,7 +77,7 @@ namespace Koi_Web_BE.UseCases.UC_Feedbacks.Commands
                     request.Rating,
                     request.Content
                     ), cancellationToken);
-                
+
                 if (!result.Succeeded)
                     return Results.BadRequest(result);
                 return Results.Created("feedback", result);
