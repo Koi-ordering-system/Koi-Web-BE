@@ -54,8 +54,8 @@ public class UpdateSpecies
         UpdateSpeciesRequest request,
      CancellationToken cancellationToken = default)
     {
-        Result<Response> result = await sender.Send(new Command(id, request.name,
-            request.description, request.yearOfDescovery, request.discoveredBy), cancellationToken);
+        Result<Response> result = await sender.Send(new Command(id, request.Name,
+            request.Description, request.YearOfDescovery, request.DiscoveredBy), cancellationToken);
         if (!result.Succeeded)
             return Results.BadRequest(result);
         return Results.NoContent();
@@ -63,9 +63,9 @@ public class UpdateSpecies
 
     public class UpdateSpeciesRequest()
     {
-        public string name { get; set; } = "";
-        public string description { get; set; } = "";
-        public int yearOfDescovery { get; set; } = 0;
-        public string discoveredBy { get; set; } = "";
+        public string Name { get; set; } = "";
+        public string Description { get; set; } = "";
+        public int YearOfDescovery { get; set; } = 0;
+        public string DiscoveredBy { get; set; } = "";
     }
 }
