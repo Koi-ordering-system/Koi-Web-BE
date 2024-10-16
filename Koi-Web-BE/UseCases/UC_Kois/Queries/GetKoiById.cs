@@ -23,6 +23,7 @@ public class GetKoiById
         public bool IsMale { get; set; } = true;
         public decimal Price { get; set; } = 0;
         public ICollection<ResponseFarm> Farms { get; set; } = new List<ResponseFarm>();
+        public ICollection<string> ImageUrls { get; set; } = new List<string>();
     }
 
     public class ResponseFarm
@@ -38,6 +39,7 @@ public class GetKoiById
             Koi? koi = await context.Kois
                 .Include(x => x.FarmKois)
                 .ThenInclude(y => y.Farm)
+                .Include(x => x.Images)
                 .AsNoTracking()
                 .FirstOrDefaultAsync(f => f.Id == request.Id, cancellationToken);
             if (koi is null)
@@ -58,6 +60,7 @@ public class GetKoiById
                     Id = fk.Farm.Id,
                     Name = fk.Farm.Name,
                 }).ToList(),
+                ImageUrls = koi.Images.Select(x => x.Url).ToList()
             };
         }
     }
