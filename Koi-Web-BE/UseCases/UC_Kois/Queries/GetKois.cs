@@ -74,8 +74,8 @@ public abstract class GetKois
         }
 
         public static async Task<IResult> Handle(ISender sender,
-            [FromQuery] int? page,
-            [FromQuery] int? size,
+            [FromQuery] int? pageIndex,
+            [FromQuery] int? pageSize,
             [FromQuery] string? sortBy,
             [FromQuery] string? sortOrder,
             CancellationToken cancellationToken = default)

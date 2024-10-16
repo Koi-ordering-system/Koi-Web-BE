@@ -10,7 +10,12 @@ namespace Koi_Web_BE.UseCases.UC_Species.Command;
 
 public class CreateSpecies
 {
-    public record Command(string Name) : IRequest<Result<Response>>;
+    public record Command(
+        string Name,
+        string Description,
+        int YearOfDescovery,
+        string DiscoveredBy
+        ) : IRequest<Result<Response>>;
 
     public record Response(
         Guid Id,
@@ -32,6 +37,9 @@ public class CreateSpecies
             Species addingSpecies = new()
             {
                 Name = request.Name,
+                Description = request.Description,
+                YearOfDiscovery = request.YearOfDescovery,
+                DiscoveredBy = request.DiscoveredBy
             };
             // add to db
             context.Species.Add(addingSpecies);
@@ -52,12 +60,25 @@ public class CreateSpecies
             .WithMetadata(new SwaggerOperationAttribute("Create a Species"))
             .RequireAuthorization();
         }
-        public static async Task<IResult> Handle(ISender sender, string name, CancellationToken cancellationToken = default)
+        public static async Task<IResult> Handle(ISender sender
+            , CreateSpeciesRequest request
+        , CancellationToken cancellationToken = default)
         {
-            Result<Response> result = await sender.Send(new Command(Name: name), cancellationToken);
+            Result<Response> result = await sender.Send(new Command(
+                Name: request.name,
+                Description: request.description,
+                YearOfDescovery: request.yearOfDescovery,
+                DiscoveredBy: request.discoveredBy), cancellationToken);
             if (!result.Succeeded)
                 return Results.BadRequest(result);
             return Results.Created("", result);
         }
     }
+
+    public record CreateSpeciesRequest(
+        string name,
+        string description,
+        int yearOfDescovery,
+        string discoveredBy
+    );
 }

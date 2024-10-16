@@ -20,13 +20,21 @@ public class GetSpecies
 
     public record Response(
         Guid Id,
-        string Name
+        string Name,
+        string Description,
+        int YearOfDiscovery,
+        string DiscoveredBy,
+        DateTimeOffset CreatedAt
     )
     {
         public static Response FromEntity(Species species)
             => new(
                 Id: species.Id,
-                Name: species.Name
+                Name: species.Name,
+                Description: species.Description,
+                YearOfDiscovery: species.YearOfDiscovery,
+                DiscoveredBy: species.DiscoveredBy,
+                CreatedAt: species.CreatedAt
             );
     };
 

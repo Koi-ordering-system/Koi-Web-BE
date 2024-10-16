@@ -99,8 +99,8 @@ public class GetFarms
         }
 
         public static async Task<IResult> Handle(ISender sender,
-            [FromQuery] int page = 1,
-            [FromQuery] int size = 10,
+            [FromQuery] int pageIndex = 1,
+            [FromQuery] int pageSize = 10,
             [FromQuery] string sortBy = "",
             [FromQuery] string sortOrder = "",
             [FromQuery] string search = "",
@@ -109,8 +109,8 @@ public class GetFarms
             if (string.IsNullOrEmpty(sortOrder) || sortOrder.Length < 3)
                 sortOrder = "Ascending";
             var response = await sender.Send(new Query(
-                page,
-                size,
+                pageIndex,
+                pageSize,
                 sortBy.ToLower(),
                 char.ToUpper(sortOrder[0]) + sortOrder[1..].ToLower(),
                 search
