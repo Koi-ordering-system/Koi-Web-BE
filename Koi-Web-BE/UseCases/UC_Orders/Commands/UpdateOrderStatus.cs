@@ -49,7 +49,7 @@ public class UpdateOrderStatus
             app.MapPatch("api/orders/{id}/status", Handle)
                 .WithTags("Orders")
                 .WithMetadata(new SwaggerOperationAttribute("Update Order Status"))
-                .RequireAuthorization();
+                .RequireAuthorization(policy => policy.RequireRole(RoleEnum.Deliverer.ToString()));
         }
 
         public static async Task<IResult> Handle(

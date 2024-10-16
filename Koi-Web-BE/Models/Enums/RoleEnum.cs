@@ -3,7 +3,7 @@ namespace Koi_Web_BE.Models.Enums;
 public enum RoleEnum
 {
     Customer,
-    Saler,
+    Seller,
     Consulting,
     Deliverer,
     Manager,
