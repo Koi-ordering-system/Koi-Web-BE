@@ -80,7 +80,13 @@ public abstract class GetKois
             [FromQuery] string? sortOrder,
             CancellationToken cancellationToken = default)
         {
-            var response = await sender.Send(new Query(), cancellationToken);
+            var response = await sender.Send(new Query
+            {
+                Page = pageIndex,
+                Size = pageSize,
+                SortBy = sortBy,
+                SortOrder = sortOrder,
+            }, cancellationToken);
             return Results.Ok(Result<PaginatedList<ResponseItem>>.Succeed(response));
         }
     }
