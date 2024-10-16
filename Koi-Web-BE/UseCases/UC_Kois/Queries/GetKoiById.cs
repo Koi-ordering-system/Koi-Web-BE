@@ -22,6 +22,13 @@ public class GetKoiById
         public decimal MaxSize { get; set; } = 0;
         public bool IsMale { get; set; } = true;
         public decimal Price { get; set; } = 0;
+        public ICollection<ResponseFarm> Farms { get; set; } = new List<ResponseFarm>();
+    }
+
+    public class ResponseFarm
+    {
+        public Guid Id { get; set; }
+        public required string Name { get; set; }
     }
 
     public class Handler(IApplicationDbContext context) : IRequestHandler<Query, Response>
@@ -29,6 +36,8 @@ public class GetKoiById
         public async Task<Response> Handle(Query request, CancellationToken cancellationToken)
         {
             Koi? koi = await context.Kois
+                .Include(x => x.FarmKois)
+                .ThenInclude(y => y.Farm)
                 .AsNoTracking()
                 .FirstOrDefaultAsync(f => f.Id == request.Id, cancellationToken);
             if (koi is null)
@@ -44,6 +53,11 @@ public class GetKoiById
                 IsMale = koi.IsMale,
                 MaxSize = koi.MaxSize,
                 MinSize = koi.MinSize,
+                Farms = koi.FarmKois.Select(fk => new ResponseFarm
+                {
+                    Id = fk.Farm.Id,
+                    Name = fk.Farm.Name,
+                }).ToList(),
             };
         }
     }

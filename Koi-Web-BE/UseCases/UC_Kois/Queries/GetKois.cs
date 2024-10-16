@@ -37,7 +37,7 @@ public abstract class GetKois
     {
         public async Task<PaginatedList<ResponseItem>> Handle(Query request, CancellationToken cancellationToken)
         {
-            var query = context.Kois.AsNoTracking();
+            var query = context.Kois.Include(x => x.FarmKois).AsNoTracking();
             Expression<Func<Koi, object>> keySelector = request.SortBy switch
             {
                 "name" => x => x.Name,
@@ -58,7 +58,7 @@ public abstract class GetKois
                     Price = x.Price,
                     IsMale = x.IsMale,
                     MaxSize = x.MaxSize,
-                    MinSize = x.MinSize
+                    MinSize = x.MinSize,
                 });
         }
     }
