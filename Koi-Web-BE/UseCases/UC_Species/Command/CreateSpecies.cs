@@ -5,6 +5,7 @@ using Koi_Web_BE.Models.Primitives;
 using MediatR;
 using Microsoft.AspNetCore.OutputCaching;
 using Swashbuckle.AspNetCore.Annotations;
+using System.Text.Json.Serialization;
 
 namespace Koi_Web_BE.UseCases.UC_Species.Command;
 
@@ -65,20 +66,21 @@ public class CreateSpecies
         , CancellationToken cancellationToken = default)
         {
             Result<Response> result = await sender.Send(new Command(
-                Name: request.name,
-                Description: request.description,
-                YearOfDescovery: request.yearOfDescovery,
-                DiscoveredBy: request.discoveredBy), cancellationToken);
+                Name: request.Name,
+                Description: request.Description,
+                YearOfDescovery: request.YearOfDescovery,
+                DiscoveredBy: request.DiscoveredBy), cancellationToken);
             if (!result.Succeeded)
                 return Results.BadRequest(result);
             return Results.Created("", result);
         }
     }
 
-    public record CreateSpeciesRequest(
-        string name,
-        string description,
-        int yearOfDescovery,
-        string discoveredBy
-    );
+    public class CreateSpeciesRequest
+    {
+        public required string Name { get; set; }
+        public string Description { get; set; } = string.Empty;
+        public int YearOfDescovery { get; set; } = 0;
+        public string DiscoveredBy { get; set; } = string.Empty;
+    }
 }
