@@ -61,7 +61,7 @@ namespace Koi_Web_BE.UseCases.UC_Feedbacks.Commands
         {
             public static void DefineEndpoints(IEndpointRouteBuilder app)
             {
-                app.MapPost("api/feedback", Handle)
+                app.MapPost("api/feedbacks", Handle)
                     .WithTags("Feedbacks")
                     .WithMetadata(new SwaggerOperationAttribute("Create a Feedback for farm"))
                     .RequireAuthorization();
