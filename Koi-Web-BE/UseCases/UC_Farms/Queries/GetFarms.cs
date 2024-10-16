@@ -106,11 +106,13 @@ public class GetFarms
             [FromQuery] string search = "",
             CancellationToken cancellationToken = default)
         {
+            if (string.IsNullOrEmpty(sortOrder) || sortOrder.Length < 3)
+                sortOrder = "Ascending";
             var response = await sender.Send(new Query(
                 pageIndex,
                 pageSize,
                 sortBy.ToLower(),
-                sortOrder,
+                char.ToUpper(sortOrder[0]) + sortOrder[1..].ToLower(),
                 search
             ), cancellationToken);
             return Results.Ok(Result<PaginatedList<FarmResponse>>.Succeed(response));
