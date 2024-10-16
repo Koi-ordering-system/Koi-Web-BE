@@ -5,7 +5,6 @@ using Koi_Web_BE.Models.Primitives;
 using MediatR;
 using Microsoft.AspNetCore.OutputCaching;
 using Swashbuckle.AspNetCore.Annotations;
-using System.Text.Json.Serialization;
 
 namespace Koi_Web_BE.UseCases.UC_Species.Command;
 
