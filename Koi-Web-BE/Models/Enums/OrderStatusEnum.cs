@@ -5,6 +5,6 @@ public enum OrderStatusEnum
     Pending,
     Packaging,
     Shipping,
-    Deliverering,
+    Delivering,
     Completed,
 }
