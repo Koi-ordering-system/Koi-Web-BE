@@ -32,7 +32,6 @@
 
     <ItemGroup>
       <Folder Include="UseCases\Test\Commands\" />
-      <Folder Include="UseCases\UC_Feedbacks\Queries\" />
     </ItemGroup>
 
 </Project>
