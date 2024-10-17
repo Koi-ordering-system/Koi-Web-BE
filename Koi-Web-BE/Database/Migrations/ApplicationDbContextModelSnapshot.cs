@@ -236,7 +236,7 @@ namespace Koi_Web_BE.Database.Migrations
                     b.Property<bool>("IsPaid")
                         .HasColumnType("boolean");
 
-                    b.Property<long>("PayOSOrderCode")
+                    b.Property<long?>("PayOSOrderCode")
                         .HasColumnType("bigint");
 
                     b.Property<decimal>("Price")

@@ -127,14 +127,14 @@ public abstract class GetKois
     {
         public static void DefineEndpoints(IEndpointRouteBuilder app)
         {
-            app.MapPost("/api/kois", Handle)
+            app.MapPost("/api/kois/get", Handle)
                 .WithTags("Kois")
                 .WithMetadata(new SwaggerOperationAttribute("Get all kois"))
                 .CacheOutput(b => b.Tag("Kois"));
         }
 
         public static async Task<IResult> Handle(ISender sender,
-            [FromBody] Request request,
+            [FromBody] GetKoiRequest request,
             CancellationToken cancellationToken = default)
         {
             var response = await sender.Send(new Query
@@ -157,7 +157,7 @@ public abstract class GetKois
             return Results.Ok(Result<PaginatedList<ResponseItem>>.Succeed(response));
         }
 
-        public class Request
+        public class GetKoiRequest
         {
             public int? PageIndex { get; init; }
             public int? PageSize { get; init; }

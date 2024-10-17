@@ -127,7 +127,7 @@ namespace Koi_Web_BE.Database.Migrations
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     UserId = table.Column<string>(type: "text", nullable: false),
-                    PayOSOrderCode = table.Column<long>(type: "bigint", nullable: false),
+                    PayOSOrderCode = table.Column<long>(type: "bigint", nullable: true),
                     FarmId = table.Column<Guid>(type: "uuid", nullable: false),
                     Price = table.Column<decimal>(type: "numeric", nullable: false),
                     IsPaid = table.Column<bool>(type: "boolean", nullable: false),
