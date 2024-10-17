@@ -20,7 +20,18 @@ public abstract class GetKois
         public int? Size { get; init; }
         public string? SortBy { get; init; }
         public string? SortOrder { get; init; }
+        public QueryFilter? Filter { get; init; }
+    }
+
+    public class QueryFilter
+    {
         public string? Search { get; init; }
+        public int? FromPrice { get; init; }
+        public int? ToPrice { get; init; }
+        public bool? IsMale { get; set; }
+        public Guid[]? TypeIds { get; init; }
+        public string[]? Colors { get; init; }
+        public (decimal MinSize, decimal MaxSize)[]? Sizes { get; init; }
     }
 
     public class ResponseItem
@@ -32,6 +43,8 @@ public abstract class GetKois
         public decimal MaxSize { get; set; } = 0;
         public bool IsMale { get; set; } = true;
         public decimal Price { get; set; } = 0;
+        public Guid SpeciesId { get; set; }
+        public string SpeciesName { get; set; } = null!;
         public ICollection<string> ImageUrls { get; set; } = new List<string>();
     }
 
@@ -42,11 +55,45 @@ public abstract class GetKois
             var query = context.Kois
                 .Include(x => x.FarmKois)
                 .Include(x => x.Images)
+                .Include(x => x.Species)
                 .AsNoTracking();
 
-            if (!string.IsNullOrEmpty(request.Search))
+            if (request.Filter is not null)
             {
-                query = query.Where(x => EF.Functions.ILike(x.Name, $"%{request.Search}%"));
+                if (!string.IsNullOrEmpty(request.Filter.Search))
+                {
+                    query = query.Where(x => EF.Functions.ILike(x.Name, $"%{request.Filter.Search}%"));
+                }
+
+                if (request.Filter.FromPrice is not null)
+                {
+                    query = query.Where(x => x.Price >= request.Filter.FromPrice);
+                }
+
+                if (request.Filter.ToPrice is not null)
+                {
+                    query = query.Where(x => x.Price <= request.Filter.ToPrice);
+                }
+
+                if (request.Filter.IsMale is not null)
+                {
+                    query = query.Where(x => x.IsMale == request.Filter.IsMale);
+                }
+
+                if (request.Filter.TypeIds is not null)
+                {
+                    query = query.Where(x => request.Filter.TypeIds.Contains(x.SpeciesId));
+                }
+
+                if (request.Filter.Colors is not null)
+                {
+                    query = query.Where(x => x.Colors.Any(y => request.Filter.Colors.Contains(y.Name)));
+                }
+
+                if (request.Filter.Sizes is not null)
+                {
+                    query = query.Where(x => request.Filter.Sizes.Any(s => s.MinSize <= x.MinSize && x.MaxSize <= s.MaxSize));
+                }
             }
             Expression<Func<Koi, object>> keySelector = request.SortBy switch
             {
@@ -69,7 +116,9 @@ public abstract class GetKois
                     IsMale = x.IsMale,
                     MaxSize = x.MaxSize,
                     MinSize = x.MinSize,
-                    ImageUrls = x.Images.Select(y => y.Url).ToList()
+                    ImageUrls = x.Images.Select(y => y.Url).ToList(),
+                    SpeciesId = x.SpeciesId,
+                    SpeciesName = x.Species.Name,
                 });
         }
     }
@@ -78,29 +127,55 @@ public abstract class GetKois
     {
         public static void DefineEndpoints(IEndpointRouteBuilder app)
         {
-            app.MapGet("/api/kois", Handle)
+            app.MapPost("/api/kois", Handle)
                 .WithTags("Kois")
                 .WithMetadata(new SwaggerOperationAttribute("Get all kois"))
                 .CacheOutput(b => b.Tag("Kois"));
         }
 
         public static async Task<IResult> Handle(ISender sender,
-            [FromQuery] int? pageIndex,
-            [FromQuery] int? pageSize,
-            [FromQuery] string? sortBy,
-            [FromQuery] string? sortOrder,
-            [FromQuery] string? search,
+            [FromBody] Request request,
             CancellationToken cancellationToken = default)
         {
             var response = await sender.Send(new Query
             {
-                Page = pageIndex,
-                Size = pageSize,
-                SortBy = sortBy,
-                SortOrder = sortOrder,
-                Search = search,
+                Page = request.PageIndex,
+                Size = request.PageSize,
+                SortBy = request.SortBy,
+                SortOrder = request.SortOrder,
+                Filter = new QueryFilter
+                {
+                    Search = request.Search,
+                    FromPrice = request.FromPrice,
+                    ToPrice = request.ToPrice,
+                    IsMale = request.IsMale,
+                    TypeIds = request.TypeIds,
+                    Colors = request.Colors,
+                    Sizes = request.Sizes?.Select(x => (x.MinSize, x.MaxSize)).ToArray(),
+                }
             }, cancellationToken);
             return Results.Ok(Result<PaginatedList<ResponseItem>>.Succeed(response));
+        }
+
+        public class Request
+        {
+            public int? PageIndex { get; init; }
+            public int? PageSize { get; init; }
+            public string? SortBy { get; init; }
+            public string? SortOrder { get; init; }
+            public string? Search { get; init; }
+            public int? FromPrice { get; init; }
+            public int? ToPrice { get; init; }
+            public bool? IsMale { get; set; }
+            public Guid[]? TypeIds { get; init; }
+            public string[]? Colors { get; init; }
+            public RequestSize[]? Sizes { get; init; }
+        }
+
+        public class RequestSize
+        {
+            public decimal MinSize { get; init; }
+            public decimal MaxSize { get; init; }
         }
     }
 }

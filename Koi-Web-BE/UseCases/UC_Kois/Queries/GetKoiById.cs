@@ -22,13 +22,17 @@ public class GetKoiById
         public decimal MaxSize { get; set; } = 0;
         public bool IsMale { get; set; } = true;
         public decimal Price { get; set; } = 0;
+        public Guid SpeciesId { get; set; }
+        public string SpeciesName { get; set; } = null!;
+        public ICollection<string> Colors { get; set; } = new List<string>();
         public ICollection<ResponseFarm> Farms { get; set; } = new List<ResponseFarm>();
         public ICollection<string> ImageUrls { get; set; } = new List<string>();
     }
 
     public class ResponseFarm
     {
-        public Guid Id { get; set; }
+        public Guid FarmKoiId { get; set; }
+        public Guid FarmId { get; set; }
         public required string Name { get; set; }
     }
 
@@ -37,6 +41,8 @@ public class GetKoiById
         public async Task<Response> Handle(Query request, CancellationToken cancellationToken)
         {
             Koi? koi = await context.Kois
+                .Include(x => x.Colors)
+                .Include(x => x.Species)
                 .Include(x => x.FarmKois)
                 .ThenInclude(y => y.Farm)
                 .Include(x => x.Images)
@@ -57,10 +63,14 @@ public class GetKoiById
                 MinSize = koi.MinSize,
                 Farms = koi.FarmKois.Select(fk => new ResponseFarm
                 {
-                    Id = fk.Farm.Id,
+                    FarmKoiId = fk.Id,
+                    FarmId = fk.Farm.Id,
                     Name = fk.Farm.Name,
                 }).ToList(),
-                ImageUrls = koi.Images.Select(x => x.Url).ToList()
+                ImageUrls = koi.Images.Select(x => x.Url).ToList(),
+                SpeciesId = koi.SpeciesId,
+                SpeciesName = koi.Species.Name,
+                Colors = koi.Colors.Select(x => x.Name).ToList(),
             };
         }
     }
