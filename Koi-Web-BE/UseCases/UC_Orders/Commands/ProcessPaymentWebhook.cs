@@ -76,15 +76,15 @@ public class ProcessPaymentWebhook
             CancellationToken cancellationToken = default
         )
         {
-            Result<Response> result = await sender.Send(
-                new Command(webhookType),
-                cancellationToken
-            );
+            // Result<Response> result = await sender.Send(
+            //     new Command(webhookType),
+            //     cancellationToken
+            // );
 
             // if (!result.Succeeded)
             //     return Results.BadRequest(result);
 
-            return Results.Created("", result);
+            return Results.Created("", null);
         }
     }
 }
