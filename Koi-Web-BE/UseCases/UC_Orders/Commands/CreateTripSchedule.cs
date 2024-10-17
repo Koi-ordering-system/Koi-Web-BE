@@ -7,6 +7,7 @@ using Koi_Web_BE.Models.Enums;
 using Koi_Web_BE.Models.Primitives;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Swashbuckle.AspNetCore.Annotations;
 
 namespace Koi_Web_BE.UseCases.UC_Orders.Commands;
 
@@ -37,7 +38,9 @@ public class CreateTripSchedule
                 if (!result.Succeeded)
                     return Results.BadRequest(result);
                 return Results.Created("", result);
-            });
+            }).WithTags("Orders")
+                .WithMetadata(new SwaggerOperationAttribute("Create Trip Schedule"))
+                .RequireAuthorization();
         }
     }
 
