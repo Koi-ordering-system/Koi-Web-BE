@@ -7,6 +7,7 @@ public class FarmKoi : BaseEntity
 {
     public required Guid FarmId { get; set; }
     public required Guid KoiId { get; set; }
+    public int Quantity { get; set; } = 1;
     // Relations
     [ForeignKey(nameof(FarmId))]
     public Farm Farm { get; set; } = null!;

@@ -204,7 +204,8 @@ namespace Koi_Web_BE.Database.Migrations
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     FarmId = table.Column<Guid>(type: "uuid", nullable: false),
-                    KoiId = table.Column<Guid>(type: "uuid", nullable: false)
+                    KoiId = table.Column<Guid>(type: "uuid", nullable: false),
+                    Quantity = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -249,7 +250,9 @@ namespace Koi_Web_BE.Database.Migrations
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     OrderId = table.Column<Guid>(type: "uuid", nullable: false),
                     KoiId = table.Column<Guid>(type: "uuid", nullable: false),
-                    Quantity = table.Column<int>(type: "integer", nullable: false)
+                    Quantity = table.Column<int>(type: "integer", nullable: false),
+                    Color = table.Column<string>(type: "text", nullable: false),
+                    Size = table.Column<decimal>(type: "numeric", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -297,7 +300,9 @@ namespace Koi_Web_BE.Database.Migrations
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     CartId = table.Column<Guid>(type: "uuid", nullable: false),
                     FarmKoiId = table.Column<Guid>(type: "uuid", nullable: false),
-                    Quantity = table.Column<int>(type: "integer", nullable: false)
+                    Quantity = table.Column<int>(type: "integer", nullable: false),
+                    Color = table.Column<string>(type: "text", nullable: false),
+                    Size = table.Column<decimal>(type: "numeric", nullable: false)
                 },
                 constraints: table =>
                 {

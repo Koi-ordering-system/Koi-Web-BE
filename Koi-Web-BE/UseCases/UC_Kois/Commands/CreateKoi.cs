@@ -20,7 +20,7 @@ public abstract class CreateKoi
         public decimal MaxSize { get; set; } = 0;
         public bool IsMale { get; set; } = true;
         public decimal Price { get; set; } = 0;
-        public IFormFileCollection KoiImages { get; set; }
+        public IFormFileCollection KoiImages { get; set; } = new FormFileCollection();
     }
 
     public class Handler(IApplicationDbContext dbContext, IOutputCacheStore store, IImageService imageService) : IRequestHandler<Command>

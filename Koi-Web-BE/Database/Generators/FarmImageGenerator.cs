@@ -10,6 +10,6 @@ public class FarmImageGenerator
         .ApplyEntitesRules()
         .RuleFor(e => e.FarmId, f => f.PickRandom(farms).Id)
         .RuleFor(e => e.Url, f => f.Image.PicsumUrl())
-        .Generate(50)
-        .DistinctBy(fi => new { fi.FarmId })];
+        .Generate(1000)
+        .DistinctBy(fi => new { fi.FarmId,fi.Url })];
 }
