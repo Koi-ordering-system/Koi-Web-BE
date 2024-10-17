@@ -69,7 +69,7 @@ public class Checkout
                 {
                     UserId = currentUser.User!.Id,
                     FarmId = cart.CartItems.First().FarmKoi.FarmId,
-                    // PayOSOrderCode = response.orderCode,
+                    PayOSOrderCode = response.orderCode,
                     Price = totalAmount,
                     IsPaid = false,
                     Status = OrderStatusEnum.Pending,

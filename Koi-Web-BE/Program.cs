@@ -15,8 +15,6 @@ builder.Services.AddMediatR(option =>
     option.RegisterServicesFromAssembly(typeof(Program).Assembly);
 });
 
-// add scoped
-builder.Services.AddScoped<IApplicationDbContext, ApplicationDbContext>();
 builder.Services.AddScoped<CurrentUser>();
 builder.Services.AddScoped<AuthMiddleware>();
 builder.Services.AddOutputCache(builder =>

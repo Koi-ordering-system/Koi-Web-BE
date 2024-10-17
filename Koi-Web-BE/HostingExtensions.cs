@@ -62,6 +62,7 @@ public static class HostingExtensions
                 // .UseSnakeCaseNamingConvention();
             }
         );
+        builder.Services.AddScoped<IApplicationDbContext, ApplicationDbContext>();
 
         builder.Services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
         builder.Services.AddMediatR(config =>
