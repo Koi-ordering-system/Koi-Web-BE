@@ -1,5 +1,4 @@
 using System.ComponentModel.DataAnnotations;
-using System.Data;
 using FluentValidation;
 using Koi_Web_BE.Database;
 using Koi_Web_BE.Endpoints.Internal;
@@ -7,7 +6,6 @@ using Koi_Web_BE.Exceptions;
 using Koi_Web_BE.Models.Entities;
 using Koi_Web_BE.Models.Primitives;
 using MediatR;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Swashbuckle.AspNetCore.Annotations;
 
@@ -15,7 +13,10 @@ namespace Koi_Web_BE.UseCases.UC_Orders.Commands;
 
 public class CreateOrder
 {
-    public record Command(Guid FarmKoiId, int Quantity = 1) : IRequest<Result<Response>>;
+    public record Command(Guid FarmKoiId,
+        string Color,
+        decimal Size,
+        int Quantity = 1) : IRequest<Result<Response>>;
 
     public record Response();
 
@@ -38,8 +39,13 @@ public class CreateOrder
             if (koi is null)
                 return Result<Response>.Fail(new NotFoundException("Koi not found."));
 
+            if (koi.Quantity < request.Quantity)
+                return Result<Response>.Fail(new BadRequestException("Not enough quantity."));
+
             Cart? cart = await context
-                .Carts.Include(c => c.CartItems)
+                .Carts
+                .AsNoTracking()
+                .Include(c => c.CartItems)
                 .FirstOrDefaultAsync(c => c.UserId == currentUser.User!.Id, cancellationToken);
 
             if (cart is null)
@@ -62,7 +68,9 @@ public class CreateOrder
                     {
                         CartId = cart.Id,
                         FarmKoiId = request.FarmKoiId,
-                        Quantity = request.Quantity
+                        Quantity = request.Quantity,
+                        Color = request.Color,
+                        Size = request.Size
                     };
 
                 await context.CartItems.AddAsync(newCartItem, cancellationToken);
@@ -84,7 +92,11 @@ public class CreateOrder
                 .RequireAuthorization();
         }
 
-        public record AddToCartRequest(Guid FarmKoiId, [Range(1, 50)] int Quantity = 1);
+        public record AddToCartRequest(Guid FarmKoiId,
+                                        string Color,
+                                        decimal Size,
+                                        [Range(1, 50)]
+                                        int Quantity = 1);
 
         public static async Task<IResult> Handle(
             ISender sender,
@@ -93,7 +105,7 @@ public class CreateOrder
         )
         {
             Result<Response> result = await sender.Send(
-                new Command(request.FarmKoiId, request.Quantity),
+                new Command(request.FarmKoiId, request.Color, request.Size, request.Quantity),
                 cancellationToken
             );
 

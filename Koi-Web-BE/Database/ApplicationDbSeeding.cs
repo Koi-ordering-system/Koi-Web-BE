@@ -26,13 +26,13 @@ public static class ApplicationDbSeeding
         Koi[] kois = KoiGenerator.Generate(species);
         Farm[] farms = FarmGenerator.Generate();
         FarmKoi[] farmKois = FarmKoiGenerator.Generate(farms, kois);
-        CartItem[] cartItems = CartItemGenerator.Generate(carts, farmKois);
-        Order[] orders = OrderGenerator.Generate(users, farms);
         Color[] colors = ColorGenerator.Generate(kois);
+        CartItem[] cartItems = CartItemGenerator.Generate(carts, farmKois, kois, colors);
+        Order[] orders = OrderGenerator.Generate(users, farms);
         KoiImage[] koiImages = KoiImageGenerator.Generate(kois);
         FarmImage[] farmImages = FarmImageGenerator.Generate(farms);
         Review[] reviews = ReviewGenerator.Generate(users, farms);
-        OrderKoi[] orderKois = OrderKoiGenerator.Generate(orders, kois);
+        OrderKoi[] orderKois = OrderKoiGenerator.Generate(orders, kois, colors);
         OrderTrip[] orderTrips = OrderTripGenerator.Generate(orders);
         IList<Task> tasks = [];
 

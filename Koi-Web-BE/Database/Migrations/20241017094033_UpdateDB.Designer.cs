@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Koi_Web_BE.Database.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20241017042602_UpdateDB")]
+    [Migration("20241017094033_UpdateDB")]
     partial class UpdateDB
     {
         /// <inheritdoc />
@@ -52,11 +52,18 @@ namespace Koi_Web_BE.Database.Migrations
                     b.Property<Guid>("CartId")
                         .HasColumnType("uuid");
 
+                    b.Property<string>("Color")
+                        .IsRequired()
+                        .HasColumnType("text");
+
                     b.Property<Guid>("FarmKoiId")
                         .HasColumnType("uuid");
 
                     b.Property<int>("Quantity")
                         .HasColumnType("integer");
+
+                    b.Property<decimal>("Size")
+                        .HasColumnType("numeric");
 
                     b.HasKey("Id");
 
@@ -148,6 +155,9 @@ namespace Koi_Web_BE.Database.Migrations
 
                     b.Property<Guid>("KoiId")
                         .HasColumnType("uuid");
+
+                    b.Property<int>("Quantity")
+                        .HasColumnType("integer");
 
                     b.HasKey("Id");
 
@@ -260,6 +270,10 @@ namespace Koi_Web_BE.Database.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
+                    b.Property<string>("Color")
+                        .IsRequired()
+                        .HasColumnType("text");
+
                     b.Property<Guid>("KoiId")
                         .HasColumnType("uuid");
 
@@ -268,6 +282,9 @@ namespace Koi_Web_BE.Database.Migrations
 
                     b.Property<int>("Quantity")
                         .HasColumnType("integer");
+
+                    b.Property<decimal>("Size")
+                        .HasColumnType("numeric");
 
                     b.HasKey("Id");
 

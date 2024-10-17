@@ -10,5 +10,6 @@ public class KoiImageGenerator
             .ApplyEntitesRules()
             .RuleFor(e => e.KoiId, f => f.PickRandom(kois).Id)
             .RuleFor(e => e.Url, f => f.Image.PicsumUrl())
-            .Generate(50)];
+            .Generate(1000)
+            .DistinctBy(fi => new { fi.KoiId,fi.Url })];
 }

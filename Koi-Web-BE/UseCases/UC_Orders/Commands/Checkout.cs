@@ -82,7 +82,9 @@ public class Checkout
                 {
                     OrderId = order.Id,
                     KoiId = ci.FarmKoi.KoiId,
-                    Quantity = ci.Quantity
+                    Quantity = ci.Quantity,
+                    Color = ci.Color,
+                    Size = ci.Size,
                 })
                 .ToList();
 
