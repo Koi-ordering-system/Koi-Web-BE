@@ -17,8 +17,7 @@ public class ProcessPaymentWebhook
 
     public record Response();
 
-    public class Handler(IApplicationDbContext context, CurrentUser currentUser)
-        : IRequestHandler<Command, Result<Response>>
+    public class Handler(IApplicationDbContext context) : IRequestHandler<Command, Result<Response>>
     {
         public async Task<Result<Response>> Handle(
             Command request,
@@ -27,17 +26,12 @@ public class ProcessPaymentWebhook
         {
             WebhookData webhookData = request.WebhookType.data;
 
-            // Process successful payment
-            var cart = await context
-                .Carts.Include(c => c.CartItems)
-                .Where(c => c.UserId == currentUser.User!.Id)
-                .FirstOrDefaultAsync(cancellationToken);
-
-            if (cart is null)
-                return Result<Response>.Fail(new NotFoundException("Cart not found."));
-
             Order? order = await context
-                .Orders.Include(o => o.OrderKois)
+                .Orders.AsSplitQuery()
+                .Include(o => o.OrderKois)
+                .Include(o => o.User)
+                .ThenInclude(u => u.Carts)
+                .ThenInclude(c => c.CartItems)
                 .Where(o => o.PayOSOrderCode == webhookData.orderCode)
                 .FirstOrDefaultAsync(cancellationToken);
 
@@ -49,7 +43,7 @@ public class ProcessPaymentWebhook
 
             context.Orders.Update(order);
 
-            context.CartItems.RemoveRange(cart.CartItems);
+            context.CartItems.RemoveRange(order.User.Carts.CartItems);
 
             await context.SaveChangesAsync(cancellationToken);
 
@@ -76,13 +70,13 @@ public class ProcessPaymentWebhook
             CancellationToken cancellationToken = default
         )
         {
-            // Result<Response> result = await sender.Send(
-            //     new Command(webhookType),
-            //     cancellationToken
-            // );
+            Result<Response> result = await sender.Send(
+                new Command(webhookType),
+                cancellationToken
+            );
 
-            // if (!result.Succeeded)
-            //     return Results.BadRequest(result);
+            if (!result.Succeeded)
+                return Results.BadRequest(result);
 
             return Results.Created("", null);
         }
