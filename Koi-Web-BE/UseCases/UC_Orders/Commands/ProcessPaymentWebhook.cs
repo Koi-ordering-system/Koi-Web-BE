@@ -67,8 +67,7 @@ public class ProcessPaymentWebhook
                     new SwaggerOperationAttribute(
                         "Handle payment webhook, called by PayOS to notify payment status"
                     )
-                )
-                .RequireAuthorization();
+                );
         }
 
         public static async Task<IResult> Handle(
