@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Koi_Web_BE.Database.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20241015183328_UpdateDB")]
+    [Migration("20241017042602_UpdateDB")]
     partial class UpdateDB
     {
         /// <inheritdoc />
@@ -228,6 +228,9 @@ namespace Koi_Web_BE.Database.Migrations
 
                     b.Property<bool>("IsPaid")
                         .HasColumnType("boolean");
+
+                    b.Property<long>("PayOSOrderCode")
+                        .HasColumnType("bigint");
 
                     b.Property<decimal>("Price")
                         .HasColumnType("numeric");

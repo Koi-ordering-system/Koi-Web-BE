@@ -11,6 +11,7 @@ public class OrderGenerator
             .ApplyEntitesRules()
             .RuleFor(e => e.UserId, f => f.PickRandom(users).Id)
             .RuleFor(e => e.FarmId, f => f.PickRandom(farms).Id)
+            .RuleFor(e=>e.PayOSOrderCode,f=>f.Random.Long(0,100))
             .RuleFor(e => e.Price, f => f.Random.Decimal(0,1000))
             .RuleFor(e=>e.IsPaid,f=>f.Random.Bool())
             .RuleFor(e=>e.Status,f=>f.Random.Bool() ? f.PickRandom<OrderStatusEnum>() : null!)

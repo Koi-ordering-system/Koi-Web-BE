@@ -7,6 +7,7 @@ namespace Koi_Web_BE.Models.Entities;
 public class Order : BaseAuditableEntity
 {
     public required string UserId { get; set; }
+    public long PayOSOrderCode { get; set; } = 0;
     public required Guid FarmId { get; set; }
     public decimal Price { get; set; } = 0;
     public required bool IsPaid { get; set; } = false;
