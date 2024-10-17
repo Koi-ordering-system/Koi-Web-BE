@@ -74,7 +74,6 @@ public class Checkout
                     IsPaid = false,
                     Status = OrderStatusEnum.Pending,
                     CreatedAt = DateTime.UtcNow,
-                    UpdatedAt = DateTime.UtcNow,
                 };
 
             // Create OrderKoi items
