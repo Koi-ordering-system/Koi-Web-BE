@@ -38,7 +38,7 @@ public class ProcessPaymentWebhook
 
             Order? order = await context
                 .Orders.Include(o => o.OrderKois)
-                // .Where(o => o.OrderCode == webhookData.orderCode)
+                .Where(o => o.PayOSOrderCode == webhookData.orderCode)
                 .FirstOrDefaultAsync(cancellationToken);
 
             if (order is null)
