@@ -239,8 +239,14 @@ namespace Koi_Web_BE.Database.Migrations
                     b.Property<long?>("PayOSOrderCode")
                         .HasColumnType("bigint");
 
+                    b.Property<decimal>("PrePaidPrice")
+                        .HasColumnType("numeric");
+
                     b.Property<decimal>("Price")
                         .HasColumnType("numeric");
+
+                    b.Property<DateTimeOffset?>("ReceivedAt")
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<int?>("Status")
                         .HasColumnType("integer");

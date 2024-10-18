@@ -130,7 +130,9 @@ namespace Koi_Web_BE.Database.Migrations
                     PayOSOrderCode = table.Column<long>(type: "bigint", nullable: true),
                     FarmId = table.Column<Guid>(type: "uuid", nullable: false),
                     Price = table.Column<decimal>(type: "numeric", nullable: false),
+                    PrePaidPrice = table.Column<decimal>(type: "numeric", nullable: false),
                     IsPaid = table.Column<bool>(type: "boolean", nullable: false),
+                    ReceivedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
                     Status = table.Column<int>(type: "integer", nullable: true),
                     CreatedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
                     UpdatedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true)
