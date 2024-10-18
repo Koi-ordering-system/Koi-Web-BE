@@ -20,13 +20,10 @@ public class GetKoiById
         public string Description { get; set; } = string.Empty;
         public decimal MinSize { get; set; } = 0;
         public decimal MaxSize { get; set; } = 0;
-        public bool IsMale { get; set; } = true;
         public decimal Price { get; set; } = 0;
-        public Guid SpeciesId { get; set; }
-        public string SpeciesName { get; set; } = null!;
-        public ICollection<string> Colors { get; set; } = new List<string>();
-        public ICollection<ResponseFarm> Farms { get; set; } = new List<ResponseFarm>();
-        public ICollection<string> ImageUrls { get; set; } = new List<string>();
+        public ICollection<string> Colors { get; set; } = [];
+        public ICollection<ResponseFarm> Farms { get; set; } = [];
+        public ICollection<string> ImageUrls { get; set; } = [];
     }
 
     public class ResponseFarm
@@ -42,23 +39,19 @@ public class GetKoiById
         {
             Koi? koi = await context.Kois
                 .Include(x => x.Colors)
-                .Include(x => x.Species)
                 .Include(x => x.FarmKois)
                 .ThenInclude(y => y.Farm)
                 .Include(x => x.Images)
                 .AsNoTracking()
                 .FirstOrDefaultAsync(f => f.Id == request.Id, cancellationToken);
             if (koi is null)
-            {
                 throw new NotFoundException("Koi not found");
-            }
 
             return new Response
             {
                 Name = koi.Name,
                 Description = koi.Description,
                 Price = koi.Price,
-                IsMale = koi.IsMale,
                 MaxSize = koi.MaxSize,
                 MinSize = koi.MinSize,
                 Farms = koi.FarmKois.Select(fk => new ResponseFarm
@@ -68,8 +61,6 @@ public class GetKoiById
                     Name = fk.Farm.Name,
                 }).ToList(),
                 ImageUrls = koi.Images.Select(x => x.Url).ToList(),
-                SpeciesId = koi.SpeciesId,
-                SpeciesName = koi.Species.Name,
                 Colors = koi.Colors.Select(x => x.Name).ToList(),
             };
         }

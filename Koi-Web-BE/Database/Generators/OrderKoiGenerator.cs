@@ -17,8 +17,8 @@ public class OrderKoiGenerator
                         kois.First(k=>k.Id==u.KoiId).MaxSize
                     )
                 )
-            .RuleFor(e => e.Color, (f, u) =>
-                f.PickRandom(colors.Where(c => c.KoiId == u.KoiId)).Name)
+            .RuleFor(e => e.ColorId, (f, u) =>
+                f.PickRandom(colors.Where(c => c.KoiId == u.KoiId)).Id)
             .Generate(1000)
             .DistinctBy(ok=>new {ok.OrderId, ok.KoiId})];
 }

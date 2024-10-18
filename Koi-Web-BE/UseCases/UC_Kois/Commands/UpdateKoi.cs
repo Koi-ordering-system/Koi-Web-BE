@@ -60,14 +60,11 @@ public class UpdateKoi
         {
             Koi? koi = dbContext.Kois.FirstOrDefault(x => x.Id == request.Id);
             if (koi is null)
-            {
                 throw new NotFoundException("Koi not found");
-            }
             koi.Name = request.Name.Trim();
             koi.Description = request.Description.Trim();
             koi.MinSize = request.MinSize;
             koi.MaxSize = request.MaxSize;
-            koi.IsMale = request.IsMale;
             koi.Price = request.Price;
             await dbContext.SaveChangesAsync(cancellationToken);
             await store.EvictByTagAsync("Kois", cancellationToken);

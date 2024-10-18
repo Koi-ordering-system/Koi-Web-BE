@@ -30,24 +30,18 @@ public class GetUnapprovedTrips
 
     public record Response(
         Guid Id,
-        string UserId,
-        string UserName,
         Guid FarmId,
         string FarmName,
-        decimal Price,
-        DateTimeOffset StartDate,
-        DateTimeOffset EndDate
+        int Days,
+        decimal Price
     )
     {
-        public static Response FromEntity(Order order) => new(
-            Id: order.Id,
-            UserId: order.UserId,
-            UserName: order.User?.Username ?? string.Empty,
-            FarmId: order.FarmId,
-            FarmName: order.Farm?.Name ?? string.Empty,
-            Price: order.Price,
-            StartDate: order.OrderTrip?.StartDate ?? default,
-            EndDate: order.OrderTrip?.EndDate ?? default
+        public static Response FromEntity(Trip trip) => new(
+            Id: trip.Id,
+            FarmId: trip.FarmId,
+            FarmName: trip.Farm?.Name ?? string.Empty,
+            Days: trip.Days,
+            Price: trip.Price
         );
     };
 
@@ -58,12 +52,10 @@ public class GetUnapprovedTrips
             if (!(currentUser.User!.IsManager() || currentUser.User!.IsAdmin()))
                 return Result<PaginatedList<Response>>.Fail(new ForbiddenException("Unauthorized."));
 
-            IQueryable<Order> query = context.Orders
+            IQueryable<Trip> query = context.Trips
                 .AsNoTracking()
                 .Include(o => o.Farm)
-                .Include(o => o.OrderTrip)
-                .Include(o => o.User)
-                .Where(o => o.OrderTrip.IsApproved == null);
+                .Where(o => o.IsApproved == null);
             int total = await query.CountAsync(cancellationToken);
             IEnumerable<Response> gettingTrips = await query
                 .Skip((request.PageIndex - 1) * request.PageSize)

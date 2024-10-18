@@ -20,18 +20,18 @@ namespace Koi_Web_BE.UseCases.UC_Feedbacks.Queries
             int Size,
             string SortBy,
             string SortOrder,
-            Guid FarmId
+            Guid OrderId
         ) : IRequest<PaginatedList<Response>>;
 
         public record Response(
             Guid Id,
-            Guid FarmId,
+            Guid OrderId,
             string UserId,
             int Rating,
             string Content)
         {
             public static Response FromEntity(Review review)
-                => new(review.Id, review.FarmId, review.UserId, review.Rating, review.Content);
+                => new(review.Id, review.OrderId, review.UserId, review.Rating, review.Content);
         }
         
         public class Handler(IApplicationDbContext context) : IRequestHandler<Query, PaginatedList<Response>>
@@ -40,7 +40,7 @@ namespace Koi_Web_BE.UseCases.UC_Feedbacks.Queries
             {
                 var query = context.Reviews
                     .AsNoTracking()
-                    .Where(r => r.FarmId == request.FarmId); 
+                    .Where(r => r.OrderId == request.OrderId); 
                 
                 // bool isSorting = !string.IsNullOrEmpty(request.SortBy); 
                 // sort

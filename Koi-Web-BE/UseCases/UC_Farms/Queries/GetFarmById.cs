@@ -1,4 +1,3 @@
-using Bogus.DataSets;
 using Koi_Web_BE.Database;
 using Koi_Web_BE.Endpoints.Internal;
 using Koi_Web_BE.Exceptions;
@@ -23,7 +22,9 @@ public class GetFarmById
         string Address,
         string Description,
         decimal Rating,
-        IEnumerable<string> FarmImages
+        IEnumerable<string> FarmImages,
+        IEnumerable<KoiResponse> Kois,
+        IEnumerable<TripResponse> Trips
     )
     {
         public static Response FromEntity(Farm farm)
@@ -33,9 +34,26 @@ public class GetFarmById
                 Address: farm.Address,
                 Description: farm.Description,
                 Rating: farm.Rating,
-                FarmImages: farm.FarmImages.Select(farmImage => farmImage.Url)
+                FarmImages: farm.FarmImages.Select(farmImage => farmImage.Url),
+                Kois: farm.FarmKois.Select(farmKoi => new KoiResponse(farmKoi.Koi.Id, farmKoi.Koi.Name, farmKoi.Quantity, farmKoi.Koi.Images.Select(image => image.Url))),
+                Trips: farm.Trips.Select(trip => new TripResponse(trip.Id, trip.Farm.Id, trip.Farm.Name, trip.Days, trip.Price))
             );
     }
+
+    public record KoiResponse(
+        Guid Id,
+        string Name,
+        int Quantity,
+        IEnumerable<string> ImageUrls
+    );
+
+    public record TripResponse(
+        Guid Id,
+        Guid FarmId,
+        string FarmName,
+        int Days,
+        decimal Price
+    );
 
     public class Handler(IApplicationDbContext context) : IRequestHandler<Query, Result<Response>>
     {
@@ -43,7 +61,10 @@ public class GetFarmById
         {
             Farm? farm = await context.Farms
                 .AsNoTracking()
+                .AsSplitQuery()
                 .Include(f => f.FarmImages)
+                .Include(f => f.Trips)
+                .Include(f => f.FarmKois).ThenInclude(f => f.Koi).ThenInclude(f => f.Images)
                 .FirstOrDefaultAsync(f => f.Id == request.Id, cancellationToken);
             if (farm is null)
                 return Result<Response>.Fail(new NotFoundException("Farm not found."));

@@ -10,7 +10,9 @@ public class Order : BaseAuditableEntity
     public long? PayOSOrderCode { get; set; }
     public required Guid FarmId { get; set; }
     public decimal Price { get; set; } = 0;
+    public decimal PrePaidPrice { get; set; } = 0;
     public required bool IsPaid { get; set; } = false;
+    public DateTimeOffset? ReceivedAt { get; set; } = null!;
     public OrderStatusEnum? Status { get; set; } = null!;
     // Relations
     [ForeignKey(nameof(UserId))]

@@ -28,14 +28,7 @@ namespace Koi_Web_BE.Database.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasColumnType("text");
-
                     b.HasKey("Id");
-
-                    b.HasIndex("UserId")
-                        .IsUnique();
 
                     b.ToTable("Carts");
                 });
@@ -63,8 +56,6 @@ namespace Koi_Web_BE.Database.Migrations
                         .HasColumnType("numeric");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("CartId");
 
                     b.HasIndex("FarmKoiId");
 
@@ -175,9 +166,6 @@ namespace Koi_Web_BE.Database.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<bool>("IsMale")
-                        .HasColumnType("boolean");
-
                     b.Property<decimal>("MaxSize")
                         .HasColumnType("numeric");
 
@@ -191,12 +179,7 @@ namespace Koi_Web_BE.Database.Migrations
                     b.Property<decimal>("Price")
                         .HasColumnType("numeric");
 
-                    b.Property<Guid>("SpeciesId")
-                        .HasColumnType("uuid");
-
                     b.HasKey("Id");
-
-                    b.HasIndex("SpeciesId");
 
                     b.ToTable("Kois");
                 });
@@ -239,8 +222,14 @@ namespace Koi_Web_BE.Database.Migrations
                     b.Property<long?>("PayOSOrderCode")
                         .HasColumnType("bigint");
 
+                    b.Property<decimal>("PrePaidPrice")
+                        .HasColumnType("numeric");
+
                     b.Property<decimal>("Price")
                         .HasColumnType("numeric");
+
+                    b.Property<DateTimeOffset?>("ReceivedAt")
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<int?>("Status")
                         .HasColumnType("integer");
@@ -267,9 +256,8 @@ namespace Koi_Web_BE.Database.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<string>("Color")
-                        .IsRequired()
-                        .HasColumnType("text");
+                    b.Property<Guid>("ColorId")
+                        .HasColumnType("uuid");
 
                     b.Property<Guid>("KoiId")
                         .HasColumnType("uuid");
@@ -284,6 +272,8 @@ namespace Koi_Web_BE.Database.Migrations
                         .HasColumnType("numeric");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("ColorId");
 
                     b.HasIndex("KoiId");
 
@@ -301,9 +291,6 @@ namespace Koi_Web_BE.Database.Migrations
                     b.Property<DateTimeOffset>("EndDate")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<bool?>("IsApproved")
-                        .HasColumnType("boolean");
-
                     b.Property<Guid>("OrderId")
                         .HasColumnType("uuid");
 
@@ -313,10 +300,15 @@ namespace Koi_Web_BE.Database.Migrations
                     b.Property<int>("Status")
                         .HasColumnType("integer");
 
+                    b.Property<Guid>("TripId")
+                        .HasColumnType("uuid");
+
                     b.HasKey("Id");
 
                     b.HasIndex("OrderId")
                         .IsUnique();
+
+                    b.HasIndex("TripId");
 
                     b.ToTable("OrderTrips");
                 });
@@ -331,7 +323,10 @@ namespace Koi_Web_BE.Database.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<Guid>("FarmId")
+                    b.Property<Guid?>("FarmId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("OrderId")
                         .HasColumnType("uuid");
 
                     b.Property<int>("Rating")
@@ -344,6 +339,8 @@ namespace Koi_Web_BE.Database.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("FarmId");
+
+                    b.HasIndex("OrderId");
 
                     b.HasIndex("UserId");
 
@@ -382,6 +379,31 @@ namespace Koi_Web_BE.Database.Migrations
                     b.ToTable("Species");
                 });
 
+            modelBuilder.Entity("Koi_Web_BE.Models.Entities.Trip", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("Days")
+                        .HasColumnType("integer");
+
+                    b.Property<Guid>("FarmId")
+                        .HasColumnType("uuid");
+
+                    b.Property<bool?>("IsApproved")
+                        .HasColumnType("boolean");
+
+                    b.Property<decimal>("Price")
+                        .HasColumnType("numeric");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("FarmId");
+
+                    b.ToTable("Trips");
+                });
+
             modelBuilder.Entity("Koi_Web_BE.Models.Entities.User", b =>
                 {
                     b.Property<string>("Id")
@@ -411,34 +433,13 @@ namespace Koi_Web_BE.Database.Migrations
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("Koi_Web_BE.Models.Entities.Cart", b =>
-                {
-                    b.HasOne("Koi_Web_BE.Models.Entities.User", "User")
-                        .WithOne("Carts")
-                        .HasForeignKey("Koi_Web_BE.Models.Entities.Cart", "UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("User");
-                });
-
             modelBuilder.Entity("Koi_Web_BE.Models.Entities.CartItem", b =>
                 {
-                    b.HasOne("Koi_Web_BE.Models.Entities.Cart", "Cart")
-                        .WithMany("CartItems")
-                        .HasForeignKey("CartId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Koi_Web_BE.Models.Entities.FarmKoi", "FarmKoi")
+                    b.HasOne("Koi_Web_BE.Models.Entities.FarmKoi", null)
                         .WithMany("CartItems")
                         .HasForeignKey("FarmKoiId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("Cart");
-
-                    b.Navigation("FarmKoi");
                 });
 
             modelBuilder.Entity("Koi_Web_BE.Models.Entities.Color", b =>
@@ -482,17 +483,6 @@ namespace Koi_Web_BE.Database.Migrations
                     b.Navigation("Koi");
                 });
 
-            modelBuilder.Entity("Koi_Web_BE.Models.Entities.Koi", b =>
-                {
-                    b.HasOne("Koi_Web_BE.Models.Entities.Species", "Species")
-                        .WithMany("Kois")
-                        .HasForeignKey("SpeciesId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Species");
-                });
-
             modelBuilder.Entity("Koi_Web_BE.Models.Entities.KoiImage", b =>
                 {
                     b.HasOne("Koi_Web_BE.Models.Entities.Koi", "Koi")
@@ -525,6 +515,12 @@ namespace Koi_Web_BE.Database.Migrations
 
             modelBuilder.Entity("Koi_Web_BE.Models.Entities.OrderKoi", b =>
                 {
+                    b.HasOne("Koi_Web_BE.Models.Entities.Color", "Color")
+                        .WithMany()
+                        .HasForeignKey("ColorId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("Koi_Web_BE.Models.Entities.Koi", "Koi")
                         .WithMany("OrderKois")
                         .HasForeignKey("KoiId")
@@ -536,6 +532,8 @@ namespace Koi_Web_BE.Database.Migrations
                         .HasForeignKey("OrderId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Color");
 
                     b.Navigation("Koi");
 
@@ -550,14 +548,26 @@ namespace Koi_Web_BE.Database.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("Koi_Web_BE.Models.Entities.Trip", "Trip")
+                        .WithMany("OrderTrips")
+                        .HasForeignKey("TripId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.Navigation("Order");
+
+                    b.Navigation("Trip");
                 });
 
             modelBuilder.Entity("Koi_Web_BE.Models.Entities.Review", b =>
                 {
-                    b.HasOne("Koi_Web_BE.Models.Entities.Farm", "Farm")
+                    b.HasOne("Koi_Web_BE.Models.Entities.Farm", null)
                         .WithMany("Reviews")
-                        .HasForeignKey("FarmId")
+                        .HasForeignKey("FarmId");
+
+                    b.HasOne("Koi_Web_BE.Models.Entities.Order", "Order")
+                        .WithMany()
+                        .HasForeignKey("OrderId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -567,14 +577,20 @@ namespace Koi_Web_BE.Database.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Farm");
+                    b.Navigation("Order");
 
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("Koi_Web_BE.Models.Entities.Cart", b =>
+            modelBuilder.Entity("Koi_Web_BE.Models.Entities.Trip", b =>
                 {
-                    b.Navigation("CartItems");
+                    b.HasOne("Koi_Web_BE.Models.Entities.Farm", "Farm")
+                        .WithMany("Trips")
+                        .HasForeignKey("FarmId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Farm");
                 });
 
             modelBuilder.Entity("Koi_Web_BE.Models.Entities.Farm", b =>
@@ -586,6 +602,8 @@ namespace Koi_Web_BE.Database.Migrations
                     b.Navigation("Orders");
 
                     b.Navigation("Reviews");
+
+                    b.Navigation("Trips");
                 });
 
             modelBuilder.Entity("Koi_Web_BE.Models.Entities.FarmKoi", b =>
@@ -612,16 +630,13 @@ namespace Koi_Web_BE.Database.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Koi_Web_BE.Models.Entities.Species", b =>
+            modelBuilder.Entity("Koi_Web_BE.Models.Entities.Trip", b =>
                 {
-                    b.Navigation("Kois");
+                    b.Navigation("OrderTrips");
                 });
 
             modelBuilder.Entity("Koi_Web_BE.Models.Entities.User", b =>
                 {
-                    b.Navigation("Carts")
-                        .IsRequired();
-
                     b.Navigation("Orders");
 
                     b.Navigation("Reviews");

@@ -14,6 +14,7 @@ public class Farm : BaseEntity
     public IList<FarmImage> FarmImages { get; set; } = [];
     public IList<Review> Reviews { get; set; } = [];
     public IList<Order> Orders { get; set; } = [];
+    public IList<Trip> Trips { get; set; } = [];
 
     public void Update(string name, string owner, string address, string description)
     {

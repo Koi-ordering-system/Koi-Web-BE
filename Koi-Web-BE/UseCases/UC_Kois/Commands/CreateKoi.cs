@@ -13,7 +13,6 @@ public abstract class CreateKoi
 {
     public class Command : IRequest
     {
-        public required Guid SpeciesId { get; set; }
         public required string Name { get; set; }
         public string Description { get; set; } = string.Empty;
         public decimal MinSize { get; set; } = 0;
@@ -30,11 +29,9 @@ public abstract class CreateKoi
             Koi koi = new()
             {
                 Name = request.Name,
-                SpeciesId = request.SpeciesId,
                 Description = request.Description,
                 MinSize = request.MinSize,
                 MaxSize = request.MaxSize,
-                IsMale = request.IsMale,
                 Price = request.Price,
             };
             dbContext.Kois.Add(koi);
@@ -68,7 +65,6 @@ public abstract class CreateKoi
 
         private static async Task<IResult> Handle(
             ISender sender,
-            [FromForm] Guid speciesId,
             [FromForm] string name,
             [FromForm] string description,
             [FromForm] decimal minSize,
@@ -81,7 +77,6 @@ public abstract class CreateKoi
             await sender.Send(new Command
             {
                 Name = name,
-                SpeciesId = speciesId,
                 Description = description,
                 Price = price,
                 IsMale = isMale,

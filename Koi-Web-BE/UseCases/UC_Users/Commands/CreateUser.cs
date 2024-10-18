@@ -29,10 +29,6 @@ public class CreateUser
                 Email = clerkUser.EmailAddresses.FirstOrDefault()?.EmailAddress ?? string.Empty,
                 PhoneNumber = clerkUser.PhoneNumbers.FirstOrDefault()?.PhoneNumber ?? string.Empty,
                 AvatarUrl = clerkUser.ImageUrl ?? string.Empty,
-                Carts = new()
-                {
-                    UserId = clerkUser.Id ?? string.Empty,
-                },
                 Role = Models.Enums.RoleEnum.Customer
             };
             if (user.Id.Equals(string.Empty))

@@ -34,7 +34,6 @@ public class GetServiceOrders
         string Status,
         DateTimeOffset StartDate,
         DateTimeOffset EndDate,
-        bool? IsApproved,
         TripStatusEnum TripStatusEnum
     )
     {
@@ -50,7 +49,6 @@ public class GetServiceOrders
                 Status: order.Status?.ToString() ?? string.Empty,
                 StartDate: order.OrderTrip?.StartDate ?? default,
                 EndDate: order.OrderTrip?.EndDate ?? default,
-                IsApproved: order.OrderTrip?.IsApproved,
                 TripStatusEnum: order.OrderTrip?.Status ?? default
             );
     }

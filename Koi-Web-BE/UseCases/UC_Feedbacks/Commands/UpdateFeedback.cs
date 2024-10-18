@@ -15,24 +15,24 @@ namespace Koi_Web_BE.UseCases.UC_Feedbacks.Commands
     public class UpdateFeedback
     {
         public record Command(Guid Id, int Rating, string Content) : IRequest<Result<Response>>;
-        
+
         public class UpdateFeedbackRequest
         {
             public int Rating { get; set; } = 5;
             public string Content { get; set; } = string.Empty;
         };
-            
+
         public record Response(
             Guid Id,
-            Guid FarmId,
+            Guid OrderId,
             string UserId,
             int Rating,
             string Content)
         {
             public static Response FromEntity(Review review)
-                => new(review.Id, review.FarmId, review.UserId, review.Rating, review.Content);
+                => new(review.Id, review.OrderId, review.UserId, review.Rating, review.Content);
         };
-        
+
         public class Handler(
             IApplicationDbContext context,
             CurrentUser currentUser,
@@ -49,14 +49,14 @@ namespace Koi_Web_BE.UseCases.UC_Feedbacks.Commands
                 bool isFeedbackUser = review.UserId == currentUser.User!.Id;
                 if (!isFeedbackUser)
                     return Result<Response>.Fail(new ForbiddenException("You are not allowed to delete this feedback"));
-                
+
                 review.Rating = request.Rating;
                 review.Content = request.Content;
-                
+
                 context.Reviews.Update(review);
                 await context.SaveChangesAsync(cancellationToken);
                 await store.EvictByTagAsync("Feedbacks", cancellationToken);
-                
+
                 var newReview = await context.Reviews.Where(r => r.Id == request.Id).SingleOrDefaultAsync(cancellationToken);
                 if (newReview is null)
                     return Result<Response>.Fail(new NotFoundException("Feedback not found"));
@@ -77,7 +77,7 @@ namespace Koi_Web_BE.UseCases.UC_Feedbacks.Commands
             public static async Task<IResult> Handle(
                 ISender sender,
                 Guid id,
-                [FromBody] UpdateFeedbackRequest request, 
+                [FromBody] UpdateFeedbackRequest request,
                 CancellationToken cancellationToken = default)
             {
                 Command command = new(id, request.Rating, request.Content);
@@ -86,7 +86,7 @@ namespace Koi_Web_BE.UseCases.UC_Feedbacks.Commands
                     return Results.BadRequest(result);
                 return Results.Ok(result);
             }
-            
+
             public class Validator : AbstractValidator<Command>
             {
                 public Validator()

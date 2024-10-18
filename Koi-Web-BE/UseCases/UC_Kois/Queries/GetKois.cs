@@ -28,7 +28,6 @@ public abstract class GetKois
         public string? Search { get; init; }
         public int? FromPrice { get; init; }
         public int? ToPrice { get; init; }
-        public bool? IsMale { get; set; }
         public Guid[]? TypeIds { get; init; }
         public string[]? Colors { get; init; }
         public (decimal MinSize, decimal MaxSize)[]? Sizes { get; init; }
@@ -41,11 +40,8 @@ public abstract class GetKois
         public string Description { get; set; } = string.Empty;
         public decimal MinSize { get; set; } = 0;
         public decimal MaxSize { get; set; } = 0;
-        public bool IsMale { get; set; } = true;
         public decimal Price { get; set; } = 0;
-        public Guid SpeciesId { get; set; }
-        public string SpeciesName { get; set; } = null!;
-        public ICollection<string> ImageUrls { get; set; } = new List<string>();
+        public ICollection<string> ImageUrls { get; set; } = [];
     }
 
     public class Handler(IApplicationDbContext context) : IRequestHandler<Query, PaginatedList<ResponseItem>>
@@ -55,7 +51,6 @@ public abstract class GetKois
             var query = context.Kois
                 .Include(x => x.FarmKois)
                 .Include(x => x.Images)
-                .Include(x => x.Species)
                 .AsNoTracking();
 
             if (request.Filter is not null)
@@ -73,16 +68,6 @@ public abstract class GetKois
                 if (request.Filter.ToPrice is not null)
                 {
                     query = query.Where(x => x.Price <= request.Filter.ToPrice);
-                }
-
-                if (request.Filter.IsMale is not null)
-                {
-                    query = query.Where(x => x.IsMale == request.Filter.IsMale);
-                }
-
-                if (request.Filter.TypeIds is not null)
-                {
-                    query = query.Where(x => request.Filter.TypeIds.Contains(x.SpeciesId));
                 }
 
                 if (request.Filter.Colors is not null)
@@ -113,12 +98,9 @@ public abstract class GetKois
                     Name = x.Name,
                     Description = x.Description,
                     Price = x.Price,
-                    IsMale = x.IsMale,
                     MaxSize = x.MaxSize,
                     MinSize = x.MinSize,
                     ImageUrls = x.Images.Select(y => y.Url).ToList(),
-                    SpeciesId = x.SpeciesId,
-                    SpeciesName = x.Species.Name,
                 });
         }
     }
@@ -148,7 +130,6 @@ public abstract class GetKois
                     Search = request.Search,
                     FromPrice = request.FromPrice,
                     ToPrice = request.ToPrice,
-                    IsMale = request.IsMale,
                     TypeIds = request.TypeIds,
                     Colors = request.Colors,
                     Sizes = request.Sizes?.Select(x => (x.MinSize, x.MaxSize)).ToArray(),
@@ -166,7 +147,6 @@ public abstract class GetKois
             public string? Search { get; init; }
             public int? FromPrice { get; init; }
             public int? ToPrice { get; init; }
-            public bool? IsMale { get; set; }
             public Guid[]? TypeIds { get; init; }
             public string[]? Colors { get; init; }
             public RequestSize[]? Sizes { get; init; }
