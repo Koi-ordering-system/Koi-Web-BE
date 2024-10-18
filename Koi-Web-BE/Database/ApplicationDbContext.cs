@@ -19,4 +19,5 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     public DbSet<Review> Reviews => Set<Review>();
     public DbSet<Species> Species => Set<Species>();
     public DbSet<User> Users => Set<User>();
+    public DbSet<Trip> Trips => Set<Trip>();
 }

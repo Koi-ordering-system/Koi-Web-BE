@@ -41,7 +41,6 @@ public class AuthMiddleware(IApplicationDbContext appContext) : IMiddleware
                 AvatarUrl = "https://img.icons8.com/color/48/000000/administrator-male.png",
                 Email = "CjT5A@example.com",
                 Role = RoleEnum.Admin,
-                Carts = new() { UserId = id }
             };
             appContext.Users.Add(checkingUser);
             await appContext.SaveChangesAsync(cancellationToken: default);

@@ -113,6 +113,7 @@ public class CreateFarm
             RuleFor(x => x.Description).NotEmpty().WithMessage("Description is required.");
             RuleFor(x => x.FarmImages)
                 .Must(HaveValidImageSizes).WithMessage("All images must be less than 10MB.");
+            RuleFor(x => x.FarmImages.Count).LessThan(8).WithMessage("At most 8 images are allowed.");
         }
 
         private bool HaveValidImageSizes(IFormFileCollection farmImages)

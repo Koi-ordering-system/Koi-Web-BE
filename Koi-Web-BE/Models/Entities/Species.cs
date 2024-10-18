@@ -9,5 +9,5 @@ public class Species : BaseAuditableEntity
     public int YearOfDiscovery { get; set; } = 0;
     public string DiscoveredBy { get; set; } = string.Empty;
     // Relations
-    public IList<Koi> Kois { get; set; } = [];
+    // public IList<Koi> Kois { get; set; } = [];
 }

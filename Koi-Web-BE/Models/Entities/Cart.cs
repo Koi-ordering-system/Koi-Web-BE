@@ -5,9 +5,9 @@ namespace Koi_Web_BE.Models.Entities;
 
 public class Cart : BaseEntity
 {
-    public required string UserId { get; set; }
+    // public required string UserId { get; set; }
     // Relations
-    [ForeignKey(nameof(UserId))]
-    public User User { get; set; } = null!;
-    public IList<CartItem> CartItems { get; set; } = [];
+    // [ForeignKey(nameof(UserId))]
+    // public User User { get; set; } = null!;
+    // public IList<CartItem> CartItems { get; set; } = [];
 }

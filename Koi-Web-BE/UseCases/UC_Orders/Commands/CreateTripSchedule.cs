@@ -15,7 +15,7 @@ public class CreateTripSchedule
 {
     public record CreateTripRequest(
         string UserId,
-        Guid FarmId,
+        Guid TripId,
         decimal Price,
         DateTimeOffset StartDate,
         DateTimeOffset EndDate
@@ -30,7 +30,7 @@ public class CreateTripSchedule
             {
 
                 Result<Response> result = await sender.Send(new Command(request.UserId,
-                                                                    request.FarmId,
+                                                                    request.TripId,
                                                                     request.Price,
                                                                     request.StartDate,
                                                                     request.EndDate
@@ -46,7 +46,7 @@ public class CreateTripSchedule
 
     public record Command(
         string UserId,
-        Guid FarmId,
+        Guid TripId,
         decimal Price,
         DateTimeOffset StartDate,
         DateTimeOffset EndDate
@@ -64,11 +64,12 @@ public class CreateTripSchedule
             if (currentUser.User.Role == RoleEnum.Customer)
                 return Result<Response>.Fail(new ForbiddenException("You are not allowed to create trip schedules."));
 
-            Farm? farm = await context.Farms
+            Trip? trip = await context.Trips
                 .AsNoTracking()
-                .FirstOrDefaultAsync(f => f.Id == request.FarmId, cancellationToken);
-            if (farm is null)
-                return Result<Response>.Fail(new NotFoundException("Farm not found."));
+                .FirstOrDefaultAsync(t => t.Id == request.TripId, cancellationToken);
+
+            if (trip is null)
+                return Result<Response>.Fail(new NotFoundException("Trip not found."));
 
             User? user = await context.Users
                 .AsNoTracking()
@@ -79,20 +80,20 @@ public class CreateTripSchedule
             Order creatingOrder = new()
             {
                 UserId = request.UserId,
-                FarmId = request.FarmId,
+                FarmId = trip!.FarmId,
                 OrderTrip = new OrderTrip
                 {
                     OrderId = Guid.NewGuid(),
+                    TripId = request.TripId,
                     Status = TripStatusEnum.Pending,
                     StartDate = request.StartDate,
                     EndDate = request.EndDate,
-                    IsApproved = false
                 },
                 Price = request.Price,
                 IsPaid = false,
             };
-
             await context.Orders.AddAsync(creatingOrder, cancellationToken);
+
             await context.SaveChangesAsync(cancellationToken);
 
             return Result<Response>.Succeed(new Response(creatingOrder.Id));

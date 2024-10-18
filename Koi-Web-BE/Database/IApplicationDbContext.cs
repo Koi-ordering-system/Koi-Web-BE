@@ -19,5 +19,6 @@ public interface IApplicationDbContext
     DbSet<Review> Reviews { get; }
     DbSet<Species> Species { get; }
     DbSet<User> Users { get; }
+    DbSet<Trip> Trips { get; }
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
 }

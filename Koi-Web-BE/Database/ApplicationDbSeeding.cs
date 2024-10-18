@@ -21,34 +21,32 @@ public static class ApplicationDbSeeding
     {
         if (IsDataExist(context)) return;
         User[] users = UserGenerator.Generate();
-        Cart[] carts = CartGenerator.Generate(users);
         Species[] species = SpeciesGenerator.Generate();
-        Koi[] kois = KoiGenerator.Generate(species);
+        Koi[] kois = KoiGenerator.Generate();
         Farm[] farms = FarmGenerator.Generate();
         FarmKoi[] farmKois = FarmKoiGenerator.Generate(farms, kois);
         Color[] colors = ColorGenerator.Generate(kois);
-        CartItem[] cartItems = CartItemGenerator.Generate(carts, farmKois, kois, colors);
         Order[] orders = OrderGenerator.Generate(users, farms);
         KoiImage[] koiImages = KoiImageGenerator.Generate(kois);
         FarmImage[] farmImages = FarmImageGenerator.Generate(farms);
-        Review[] reviews = ReviewGenerator.Generate(users, farms);
+        Review[] reviews = ReviewGenerator.Generate(users, orders);
         OrderKoi[] orderKois = OrderKoiGenerator.Generate(orders, kois, colors);
-        OrderTrip[] orderTrips = OrderTripGenerator.Generate(orders);
+        Trip[] trips = TripGenerator.Generate(farms);
+        OrderTrip[] orderTrips = OrderTripGenerator.Generate(orders, trips);
         IList<Task> tasks = [];
 
         tasks.Add(context.Users.AddRangeAsync(users));
-        tasks.Add(context.Carts.AddRangeAsync(carts));
         tasks.Add(context.Species.AddRangeAsync(species));
         tasks.Add(context.Kois.AddRangeAsync(kois));
         tasks.Add(context.Farms.AddRangeAsync(farms));
         tasks.Add(context.FarmKois.AddRangeAsync(farmKois));
-        tasks.Add(context.CartItems.AddRangeAsync(cartItems));
         tasks.Add(context.Orders.AddRangeAsync(orders));
         tasks.Add(context.Colors.AddRangeAsync(colors));
         tasks.Add(context.KoiImages.AddRangeAsync(koiImages));
         tasks.Add(context.FarmImages.AddRangeAsync(farmImages));
         tasks.Add(context.Reviews.AddRangeAsync(reviews));
         tasks.Add(context.OrderKois.AddRangeAsync(orderKois));
+        tasks.Add(context.Trips.AddRangeAsync(trips));
         tasks.Add(context.OrderTrips.AddRangeAsync(orderTrips));
         await Task.WhenAll(tasks);
 
