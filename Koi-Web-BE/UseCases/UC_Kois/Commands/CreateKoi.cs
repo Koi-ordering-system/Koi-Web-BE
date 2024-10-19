@@ -1,5 +1,6 @@
 using Koi_Web_BE.Database;
 using Koi_Web_BE.Endpoints.Internal;
+using Koi_Web_BE.Extensions;
 using Koi_Web_BE.Models.Entities;
 using Koi_Web_BE.Utils;
 using MediatR;
@@ -17,8 +18,8 @@ public abstract class CreateKoi
         public string Description { get; set; } = string.Empty;
         public decimal MinSize { get; set; } = 0;
         public decimal MaxSize { get; set; } = 0;
-        public bool IsMale { get; set; } = true;
         public decimal Price { get; set; } = 0;
+        public IEnumerable<string> Colors { get; set; } = [];
         public IFormFileCollection KoiImages { get; set; } = new FormFileCollection();
     }
 
@@ -26,18 +27,25 @@ public abstract class CreateKoi
     {
         public async Task Handle(Command request, CancellationToken cancellationToken)
         {
+            Guid koiId = Guid.NewGuid();
             Koi koi = new()
             {
+                Id = koiId,
                 Name = request.Name,
                 Description = request.Description,
                 MinSize = request.MinSize,
                 MaxSize = request.MaxSize,
                 Price = request.Price,
+                Colors = [..request.Colors.Select(x => new Color
+                {
+                    KoiId = koiId,
+                    Name = x,
+                })]
             };
             dbContext.Kois.Add(koi);
             var uploadTasks = request.KoiImages.Select(async image =>
             {
-                var imageUrl = await imageService.UploadImageAsync(image, image.FileName, "farms");
+                var imageUrl = await imageService.UploadImageAsync(image, image.FileName, "kois");
                 return new KoiImage
                 {
                     KoiId = koi.Id,
@@ -69,9 +77,9 @@ public abstract class CreateKoi
             [FromForm] string description,
             [FromForm] decimal minSize,
             [FromForm] decimal maxSize,
-            [FromForm] bool isMale,
             [FromForm] decimal price,
             [FromForm] IFormFileCollection koiImages,
+            [FromForm] string colors,
             CancellationToken cancellationToken = default)
         {
             await sender.Send(new Command
@@ -79,9 +87,9 @@ public abstract class CreateKoi
                 Name = name,
                 Description = description,
                 Price = price,
-                IsMale = isMale,
                 MaxSize = maxSize,
                 MinSize = minSize,
+                Colors = colors.Split(','),
             }, cancellationToken);
             return Results.Created();
         }
