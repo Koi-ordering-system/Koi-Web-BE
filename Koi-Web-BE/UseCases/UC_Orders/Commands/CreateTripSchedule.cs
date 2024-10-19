@@ -13,7 +13,7 @@ namespace Koi_Web_BE.UseCases.UC_Orders.Commands;
 
 public class CreateTripSchedule
 {
-    public record CreateTripRequest(
+    public record CreateOrderTripRequest(
         string UserId,
         Guid TripId,
         decimal Price,
@@ -25,7 +25,7 @@ public class CreateTripSchedule
     {
         public static void DefineEndpoints(IEndpointRouteBuilder app)
         {
-            app.MapPost("/api/trips", async (ISender sender, CreateTripRequest request) =>
+            app.MapPost("/api/order/trip", async (ISender sender, CreateOrderTripRequest request) =>
             {
                 Result<Response> result = await sender.Send(new Command(request.UserId,
                                                                     request.TripId,
