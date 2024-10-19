@@ -21,7 +21,6 @@ public static class ApplicationDbSeeding
     {
         if (IsDataExist(context)) return;
         User[] users = UserGenerator.Generate();
-        Species[] species = SpeciesGenerator.Generate();
         Koi[] kois = KoiGenerator.Generate();
         Farm[] farms = FarmGenerator.Generate();
         FarmKoi[] farmKois = FarmKoiGenerator.Generate(farms, kois);
@@ -36,7 +35,6 @@ public static class ApplicationDbSeeding
         IList<Task> tasks = [];
 
         tasks.Add(context.Users.AddRangeAsync(users));
-        tasks.Add(context.Species.AddRangeAsync(species));
         tasks.Add(context.Kois.AddRangeAsync(kois));
         tasks.Add(context.Farms.AddRangeAsync(farms));
         tasks.Add(context.FarmKois.AddRangeAsync(farmKois));
@@ -53,9 +51,7 @@ public static class ApplicationDbSeeding
         await context.SaveChangesAsync();
     }
     private static bool IsDataExist(ApplicationDbContext context)
-        => context.Carts.Any()
-        || context.CartItems.Any()
-        || context.Colors.Any()
+        => context.Colors.Any()
         || context.Farms.Any()
         || context.FarmImages.Any()
         || context.FarmKois.Any()
@@ -65,6 +61,5 @@ public static class ApplicationDbSeeding
         || context.OrderKois.Any()
         || context.OrderTrips.Any()
         || context.Reviews.Any()
-        || context.Species.Any()
         || context.Users.Any();
 }

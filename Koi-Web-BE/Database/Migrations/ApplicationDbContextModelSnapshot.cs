@@ -22,46 +22,6 @@ namespace Koi_Web_BE.Database.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("Koi_Web_BE.Models.Entities.Cart", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Carts");
-                });
-
-            modelBuilder.Entity("Koi_Web_BE.Models.Entities.CartItem", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid>("CartId")
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("Color")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<Guid>("FarmKoiId")
-                        .HasColumnType("uuid");
-
-                    b.Property<int>("Quantity")
-                        .HasColumnType("integer");
-
-                    b.Property<decimal>("Size")
-                        .HasColumnType("numeric");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("FarmKoiId");
-
-                    b.ToTable("CartItems");
-                });
-
             modelBuilder.Entity("Koi_Web_BE.Models.Entities.Color", b =>
                 {
                     b.Property<Guid>("Id")
@@ -347,38 +307,6 @@ namespace Koi_Web_BE.Database.Migrations
                     b.ToTable("Reviews");
                 });
 
-            modelBuilder.Entity("Koi_Web_BE.Models.Entities.Species", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<DateTimeOffset>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("DiscoveredBy")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<DateTimeOffset?>("UpdatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<int>("YearOfDiscovery")
-                        .HasColumnType("integer");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Species");
-                });
-
             modelBuilder.Entity("Koi_Web_BE.Models.Entities.Trip", b =>
                 {
                     b.Property<Guid>("Id")
@@ -431,15 +359,6 @@ namespace Koi_Web_BE.Database.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Users");
-                });
-
-            modelBuilder.Entity("Koi_Web_BE.Models.Entities.CartItem", b =>
-                {
-                    b.HasOne("Koi_Web_BE.Models.Entities.FarmKoi", null)
-                        .WithMany("CartItems")
-                        .HasForeignKey("FarmKoiId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
                 });
 
             modelBuilder.Entity("Koi_Web_BE.Models.Entities.Color", b =>
@@ -604,11 +523,6 @@ namespace Koi_Web_BE.Database.Migrations
                     b.Navigation("Reviews");
 
                     b.Navigation("Trips");
-                });
-
-            modelBuilder.Entity("Koi_Web_BE.Models.Entities.FarmKoi", b =>
-                {
-                    b.Navigation("CartItems");
                 });
 
             modelBuilder.Entity("Koi_Web_BE.Models.Entities.Koi", b =>

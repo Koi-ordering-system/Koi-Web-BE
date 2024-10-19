@@ -12,17 +12,6 @@ namespace Koi_Web_BE.Database.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "Carts",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uuid", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Carts", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "Farms",
                 columns: table => new
                 {
@@ -52,23 +41,6 @@ namespace Koi_Web_BE.Database.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Kois", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Species",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    Name = table.Column<string>(type: "text", nullable: false),
-                    Description = table.Column<string>(type: "text", nullable: false),
-                    YearOfDiscovery = table.Column<int>(type: "integer", nullable: false),
-                    DiscoveredBy = table.Column<string>(type: "text", nullable: false),
-                    CreatedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
-                    UpdatedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Species", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -225,28 +197,6 @@ namespace Koi_Web_BE.Database.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "CartItems",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    CartId = table.Column<Guid>(type: "uuid", nullable: false),
-                    FarmKoiId = table.Column<Guid>(type: "uuid", nullable: false),
-                    Quantity = table.Column<int>(type: "integer", nullable: false),
-                    Color = table.Column<string>(type: "text", nullable: false),
-                    Size = table.Column<decimal>(type: "numeric", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_CartItems", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_CartItems_FarmKois_FarmKoiId",
-                        column: x => x.FarmKoiId,
-                        principalTable: "FarmKois",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "OrderKois",
                 columns: table => new
                 {
@@ -342,11 +292,6 @@ namespace Koi_Web_BE.Database.Migrations
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_CartItems_FarmKoiId",
-                table: "CartItems",
-                column: "FarmKoiId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_Colors_KoiId",
                 table: "Colors",
                 column: "KoiId");
@@ -432,13 +377,10 @@ namespace Koi_Web_BE.Database.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "CartItems");
-
-            migrationBuilder.DropTable(
-                name: "Carts");
-
-            migrationBuilder.DropTable(
                 name: "FarmImages");
+
+            migrationBuilder.DropTable(
+                name: "FarmKois");
 
             migrationBuilder.DropTable(
                 name: "KoiImages");
@@ -451,12 +393,6 @@ namespace Koi_Web_BE.Database.Migrations
 
             migrationBuilder.DropTable(
                 name: "Reviews");
-
-            migrationBuilder.DropTable(
-                name: "Species");
-
-            migrationBuilder.DropTable(
-                name: "FarmKois");
 
             migrationBuilder.DropTable(
                 name: "Colors");
