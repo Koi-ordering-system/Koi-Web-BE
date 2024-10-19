@@ -6,21 +6,34 @@ using Koi_Web_BE.Models.Primitives;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Swashbuckle.AspNetCore.Annotations;
+using System.Text.Json.Serialization;
 
 namespace Koi_Web_BE.UseCases.UC_Trips.Queries;
 
 public class GetTrips
 {
     public record Query(
-        Guid? farmId,
-        Guid? koiId,
-        decimal? minPrice,
-        decimal? maxPrice,
-        DateTimeOffset? startDate,
-        DateTimeOffset? endDate,
+        int PageIndex = 1,
+        int PageSize = 10,
+        string Keyword = "",
+        Guid? FarmId = null,
+        Guid? KoiId = null,
+        decimal? MinPrice = null,
+        decimal? MaxPrice = null,
+        DateTimeOffset? StartDate = null,
+        DateTimeOffset? EndDate = null
+    ) : IRequest<Result<PaginatedList<Response>>>;
+
+    public record GetTripsRequest(
         int pageIndex = 1,
         int pageSize = 10,
-        string keyword = ""
+        string keyword = "",
+        Guid? farmId = null,
+        Guid? koiId = null,
+        decimal? minPrice = null,
+        decimal? maxPrice = null,
+        DateTimeOffset? startDate = null,
+        DateTimeOffset? endDate = null
     ) : IRequest<Result<PaginatedList<Response>>>;
 
     public record Response(
@@ -62,35 +75,35 @@ public class GetTrips
                 .Include(t => t.Farm).ThenInclude(f => f.FarmKois).ThenInclude(fk => fk.Koi)
                 .Where(t => t.IsApproved == true);
 
-            if (request.farmId is not null)
-                query = query.Where(t => t.FarmId == request.farmId);
+            if (request.FarmId is not null)
+                query = query.Where(t => t.FarmId == request.FarmId);
 
-            if (request.koiId is not null)
-                query = query.Where(t => t.Farm.FarmKois.Any(fk => fk.KoiId == request.koiId));
+            if (request.KoiId is not null)
+                query = query.Where(t => t.Farm.FarmKois.Any(fk => fk.KoiId == request.KoiId));
 
-            if (request.minPrice is not null)
-                query = query.Where(t => t.Price >= request.minPrice);
+            if (request.MinPrice is not null)
+                query = query.Where(t => t.Price >= request.MinPrice);
 
-            if (request.maxPrice is not null)
-                query = query.Where(t => t.Price <= request.maxPrice);
+            if (request.MaxPrice is not null)
+                query = query.Where(t => t.Price <= request.MaxPrice);
 
-            if (request.startDate is not null && request.endDate is not null)
-                query = query.Where(t => t.Days == (request.endDate - request.startDate)!.Value.Days);
+            if (request.StartDate is not null && request.EndDate is not null)
+                query = query.Where(t => t.Days == (request.EndDate - request.StartDate)!.Value.Days);
 
-            if (!string.IsNullOrEmpty(request.keyword))
-                query = query.Where(t => EF.Functions.ILike(t.Farm.Name, $"%{request.keyword}%"));
+            if (!string.IsNullOrEmpty(request.Keyword))
+                query = query.Where(t => EF.Functions.ILike(t.Farm.Name, $"%{request.Keyword}%"));
 
             int total = await query.CountAsync(cancellationToken);
             IEnumerable<Response> gettingTrips = await query
-                .Skip((request.pageIndex - 1) * request.pageSize)
-                .Take(request.pageSize)
+                .Skip((request.PageIndex - 1) * request.PageSize)
+                .Take(request.PageSize)
                 .Select(t => Response.FromEntity(t))
                 .ToListAsync(cancellationToken);
             return Result<PaginatedList<Response>>.Succeed(new(
                 gettingTrips.ToList(),
                  total,
-                 request.pageIndex,
-                 request.pageSize));
+                 request.PageIndex,
+                 request.PageSize));
         }
     }
 
@@ -103,9 +116,19 @@ public class GetTrips
             .WithMetadata(new SwaggerOperationAttribute("Get all Trips"))
             .CacheOutput(b => b.Tag("Trips"));
         }
-        public static async Task<IResult> Handle(ISender sender, [AsParameters] Query request, CancellationToken cancellationToken = default)
+        public static async Task<IResult> Handle(ISender sender, [AsParameters] GetTripsRequest request, CancellationToken cancellationToken = default)
         {
-            Result<PaginatedList<Response>> response = await sender.Send(request, cancellationToken);
+            Result<PaginatedList<Response>> response = await sender.Send(new Query(
+                request.pageIndex,
+                request.pageSize,
+                request.keyword,
+                request.farmId,
+                request.koiId,
+                request.minPrice,
+                request.maxPrice,
+                request.startDate,
+                request.endDate
+            ), cancellationToken);
             return Results.Ok(response);
         }
 

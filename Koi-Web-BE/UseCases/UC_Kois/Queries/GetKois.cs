@@ -5,7 +5,6 @@ using Koi_Web_BE.Models;
 using Koi_Web_BE.Models.Entities;
 using Koi_Web_BE.Models.Primitives;
 using MediatR;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Swashbuckle.AspNetCore.Annotations;
 using System.Linq.Expressions;
@@ -14,21 +13,17 @@ namespace Koi_Web_BE.UseCases.UC_Kois.Queries;
 
 public abstract class GetKois
 {
-    public class Query : IRequest<PaginatedList<ResponseItem>>
-    {
-        public int? Page { get; init; }
-        public int? Size { get; init; }
-        public string? Search { get; init; }
-    }
+    public record Query(
+        int Page,
+        int Size,
+        string Search
+    ) : IRequest<PaginatedList<ResponseItem>>;
 
-    // public class QueryFilter
-    // {
-    //     public int? FromPrice { get; init; }
-    //     public int? ToPrice { get; init; }
-    //     public Guid[]? TypeIds { get; init; }
-    //     public string[]? Colors { get; init; }
-    //     public (decimal MinSize, decimal MaxSize)[]? Sizes { get; init; }
-    // }
+    public record GetKoisRequest(
+        int pageIndex = 1,
+        int pageSize = 10,
+        string keyword = ""
+    );
 
     public class ResponseItem
     {
@@ -38,7 +33,8 @@ public abstract class GetKois
         public decimal MinSize { get; set; } = 0;
         public decimal MaxSize { get; set; } = 0;
         public decimal Price { get; set; } = 0;
-        public ICollection<string> ImageUrls { get; set; } = [];
+        public string[] ImageUrls { get; set; } = [];
+        public string[] Colors { get; set; } = [];
     }
 
     public class Handler(IApplicationDbContext context) : IRequestHandler<Query, PaginatedList<ResponseItem>>
@@ -48,6 +44,7 @@ public abstract class GetKois
             var query = context.Kois
                 .Include(x => x.FarmKois)
                 .Include(x => x.Images)
+                .Include(x => x.Colors)
                 .AsNoTracking();
 
             if (!string.IsNullOrEmpty(request.Search))
@@ -55,40 +52,7 @@ public abstract class GetKois
                 query = query.Where(x => EF.Functions.ILike(x.Name, $"%{request.Search}%"));
             }
 
-            // if (request.Filter is not null)
-            // {
-            //     if (!string.IsNullOrEmpty(request.Filter.Search))
-            //     {
-            //         query = query.Where(x => EF.Functions.ILike(x.Name, $"%{request.Filter.Search}%"));
-            //     }
-
-            //     if (request.Filter.FromPrice is not null)
-            //     {
-            //         query = query.Where(x => x.Price >= request.Filter.FromPrice);
-            //     }
-
-            //     if (request.Filter.ToPrice is not null)
-            //     {
-            //         query = query.Where(x => x.Price <= request.Filter.ToPrice);
-            //     }
-
-            //     if (request.Filter.Colors is not null)
-            //     {
-            //         query = query.Where(x => x.Colors.Any(y => request.Filter.Colors.Contains(y.Name)));
-            //     }
-
-            //     if (request.Filter.Sizes is not null)
-            //     {
-            //         query = query.Where(x => request.Filter.Sizes.Any(s => s.MinSize <= x.MinSize && x.MaxSize <= s.MaxSize));
-            //     }
-            // }
             Expression<Func<Koi, object>> keySelector = x => x.Name;
-
-            // {
-            //     "name" => x => x.Name,
-            //     "description" => x => x.Description,
-            //     _ => x => x.Name,
-            // };
 
             return await query.ListPaginateWithOrderAsync(
                 request.Page,
@@ -103,7 +67,8 @@ public abstract class GetKois
                     Price = x.Price,
                     MaxSize = x.MaxSize,
                     MinSize = x.MinSize,
-                    ImageUrls = x.Images.Select(y => y.Url).ToList(),
+                    ImageUrls = x.Images.Select(y => y.Url).ToArray(),
+                    Colors = x.Colors.Select(y => y.Name).ToArray(),
                 });
         }
     }
@@ -119,17 +84,13 @@ public abstract class GetKois
         }
 
         public static async Task<IResult> Handle(ISender sender,
-            int pageIndex = 1,
-            int pageSize = 10,
-            string search = "",
-            CancellationToken cancellationToken = default)
+            [AsParameters] GetKoisRequest request)
         {
-            var response = await sender.Send(new Query
-            {
-                Page = pageIndex,
-                Size = pageSize,
-                Search = search,
-            }, cancellationToken);
+            var response = await sender.Send(new Query(
+                request.pageIndex,
+                request.pageSize,
+                request.keyword
+            ), default);
             return Results.Ok(Result<PaginatedList<ResponseItem>>.Succeed(response));
         }
 

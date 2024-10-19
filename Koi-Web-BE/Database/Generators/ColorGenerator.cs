@@ -10,7 +10,7 @@ public class ColorGenerator
         => [.. new Faker<Color>()
             .ApplyEntitesRules()
             .RuleFor(e => e.KoiId, f => f.PickRandom(kois).Id)
-            .RuleFor(e => e.Name, f => f.Commerce.Color().FirstCharToUpper())
+            .RuleFor(e => e.Name, f => f.Commerce.Color().ToLower())
             .Generate(1000)
             .DistinctBy(c => new { c.KoiId, c.Name })];
 
