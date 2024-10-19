@@ -21,10 +21,15 @@ public class GetKoiById
         public decimal MinSize { get; set; } = 0;
         public decimal MaxSize { get; set; } = 0;
         public decimal Price { get; set; } = 0;
-        public ICollection<string> Colors { get; set; } = [];
+        public ColorResponse[] Colors { get; set; } = [];
         public ICollection<ResponseFarm> Farms { get; set; } = [];
         public ICollection<string> ImageUrls { get; set; } = [];
     }
+
+    public record ColorResponse(
+        Guid Id,
+        string Name
+    );
 
     public class ResponseFarm
     {
@@ -61,7 +66,7 @@ public class GetKoiById
                     Name = fk.Farm.Name,
                 }).ToList(),
                 ImageUrls = koi.Images.Select(x => x.Url).ToList(),
-                Colors = koi.Colors.Select(x => x.Name).ToList(),
+                Colors = koi.Colors.Select(x => new ColorResponse(x.Id, x.Name)).ToArray(),
             };
         }
     }
