@@ -25,16 +25,13 @@ public class CreateTripSchedule
     {
         public static void DefineEndpoints(IEndpointRouteBuilder app)
         {
-
             app.MapPost("/api/trips", async (ISender sender, CreateTripRequest request) =>
             {
-
                 Result<Response> result = await sender.Send(new Command(request.UserId,
                                                                     request.TripId,
                                                                     request.Price,
                                                                     request.StartDate,
-                                                                    request.EndDate
-                                                                        ), default);
+                                                                    request.EndDate), default);
                 if (!result.Succeeded)
                     return Results.BadRequest(result);
                 return Results.Created("", result);
