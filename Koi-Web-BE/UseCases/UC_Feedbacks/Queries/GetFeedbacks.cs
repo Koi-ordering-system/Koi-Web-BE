@@ -65,14 +65,14 @@ namespace Koi_Web_BE.UseCases.UC_Feedbacks.Queries
         {
             public static void DefineEndpoints(IEndpointRouteBuilder app)
             {
-                app.MapGet("/api/farms/{farmId}/feedbacks", Handle)
+                app.MapGet("/api/farms/{orderId:guid}/feedbacks", Handle)
                     .WithTags("Farms")
                     .WithMetadata(new SwaggerOperationAttribute("Get feedbacks of a Farm"))
                     .CacheOutput(b => b.Tag("Feedbacks"));
             }
 
             public static async Task<IResult> Handle(ISender sender,
-                Guid farmId,
+                Guid orderId,
                 [FromQuery] int pageIndex = 1,
                 [FromQuery] int pageSize = 10,
                 [FromQuery] string sortBy = "",
@@ -86,7 +86,7 @@ namespace Koi_Web_BE.UseCases.UC_Feedbacks.Queries
                     pageSize,
                     sortBy.ToLower(),
                     char.ToUpper(sortOrder[0]) + sortOrder[1..].ToLower(),
-                    farmId
+                    orderId
                     ), cancellationToken);
                 return Results.Ok(Result<PaginatedList<Response>>.Succeed(response));
             }
