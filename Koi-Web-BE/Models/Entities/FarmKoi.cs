@@ -13,5 +13,4 @@ public class FarmKoi : BaseEntity
     public Farm Farm { get; set; } = null!;
     [ForeignKey(nameof(KoiId))]
     public Koi Koi { get; set; } = null!;
-    public IList<CartItem> CartItems { get; set; } = null!;
 }
