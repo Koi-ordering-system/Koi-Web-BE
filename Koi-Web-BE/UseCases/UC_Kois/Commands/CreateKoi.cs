@@ -39,7 +39,7 @@ public abstract class CreateKoi
                 Colors = [..request.Colors.Select(x => new Color
                 {
                     KoiId = koiId,
-                    Name = x.FirstCharToUpper(),
+                    Name = x,
                 })]
             };
             dbContext.Kois.Add(koi);
