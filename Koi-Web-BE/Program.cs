@@ -91,12 +91,6 @@ else
     app.MigrateDatabase<ApplicationDbContext>(async (_, _) => await Task.Delay(0));
 }
 app.UseCors();
-app.UseAuthentication();
-app.UseAuthorization();
-app.UseOutputCache();
-app.UseMiddleware<AuthMiddleware>();
-app.UseMiddleware<ExceptionMiddleware>();
-app.MapHub<ChatHub>("/chat");
 var webSocketOptions = new WebSocketOptions
 {
     KeepAliveInterval = TimeSpan.FromHours(1)
@@ -104,6 +98,12 @@ var webSocketOptions = new WebSocketOptions
 
 webSocketOptions.AllowedOrigins.Add("*");
 app.UseWebSockets(webSocketOptions);
+app.UseAuthentication();
+app.UseAuthorization();
+app.UseOutputCache();
+app.UseMiddleware<AuthMiddleware>();
+app.UseMiddleware<ExceptionMiddleware>();
+app.MapHub<ChatHub>("/chat");
 
 app.UseHttpsRedirection();
 
