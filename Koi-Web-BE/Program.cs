@@ -3,6 +3,7 @@ using Koi_Web_BE.Database;
 using Koi_Web_BE.Endpoints.Internal;
 using Koi_Web_BE.Middlewares;
 using Koi_Web_BE.Models.Primitives;
+using Koi_Web_BE.Utils;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
@@ -95,6 +96,7 @@ app.UseAuthorization();
 app.UseOutputCache();
 app.UseMiddleware<AuthMiddleware>();
 app.UseMiddleware<ExceptionMiddleware>();
+app.MapHub<ChatHub>("/chat");
 
 app.UseHttpsRedirection();
 

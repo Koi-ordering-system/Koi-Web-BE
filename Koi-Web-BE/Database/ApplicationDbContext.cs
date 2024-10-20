@@ -17,4 +17,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     public DbSet<Review> Reviews => Set<Review>();
     public DbSet<User> Users => Set<User>();
     public DbSet<Trip> Trips => Set<Trip>();
+    public DbSet<ChatMessage> ChatMessages => Set<ChatMessage>();
+    public DbSet<ChatRoom> ChatRooms => Set<ChatRoom>();
+    public DbSet<UserConnection> UserConnections => Set<UserConnection>();
 }

@@ -33,6 +33,7 @@ public static class HostingExtensions
         ));
 
         builder.Services.AddPayOSService(configuration);
+        builder.Services.AddSignalR();
         builder.Services.AddUrlSettings(configuration);
 
         builder.Services.AddEndpointsApiExplorer();

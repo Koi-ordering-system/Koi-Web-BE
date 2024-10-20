@@ -15,6 +15,7 @@ public class User : BaseEntity
     public IList<Order> Orders { get; set; } = [];
     // public Cart Carts { get; set; } = null!;
     public IList<Review> Reviews { get; set; } = [];
+    public IList<UserConnection> UserConnections { get; set; } = [];
 
     public bool IsAdmin() => Role.Equals(RoleEnum.Admin);
     public bool IsManager() => Role.Equals(RoleEnum.Manager);
