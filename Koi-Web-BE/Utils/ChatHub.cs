@@ -26,7 +26,37 @@ public class ChatHub(IApplicationDbContext context, CurrentUser currentUser) : H
             );
     }
 
-    public async Task<IEnumerable<ChatMessageResponse>> GetMessages(Guid roomId)
+    public record RoomResponse(
+        Guid RoomId,
+        string RoomName,
+        IEnumerable<ChatMessageResponse> ChatMessages
+    )
+    {
+        public static RoomResponse MapToRoomResponse(ChatRoom chatRoom) =>
+            new(
+                RoomId: chatRoom.Id,
+                RoomName: chatRoom.RoomName,
+                ChatMessages: chatRoom.chatMessages.Select(ChatMessageResponse.MapToChatMessageResponse)
+            );
+    }
+
+    public async Task<IEnumerable<RoomResponse>> GetExistingRooms()
+    {
+        //get existing chat rooms
+        var chatRooms = await context.ChatRooms
+            .AsNoTracking()
+            .Include(cr => cr.userConnections)
+            .Include(cr => cr.chatMessages)
+            .Where(cr => cr.userConnections.Any(uc => uc.UserId == currentUser.User!.Id))
+            .ToListAsync();
+        if (chatRooms is not null)
+        {
+            return chatRooms.Select(RoomResponse.MapToRoomResponse);
+        }
+        return [];
+    }
+
+    public async Task<IEnumerable<ChatMessageResponse>> GetChatMessages(Guid roomId)
     {
         var chatMessages = await context.ChatMessages
             .AsNoTracking()
@@ -48,16 +78,25 @@ public class ChatHub(IApplicationDbContext context, CurrentUser currentUser) : H
             .FirstOrDefaultAsync();
         //check if chat room exists
         var chatRoom = await context.ChatRooms
-            .AsNoTracking()
             .FirstOrDefaultAsync(cr => cr.RoomName == roomName);
         if (userConn == null)
         {
+            // If chat room does not exist
+            if (chatRoom == null)
+            {
+                chatRoom = new ChatRoom { RoomName = roomName };
+                await context.ChatRooms.AddAsync(chatRoom);
+            }
+
             // Add the user to the chat room
             var userConnection = new UserConnection
             {
                 UserId = currentUser.User!.Id,
-                ChatRoom = chatRoom ?? new ChatRoom { RoomName = roomName }
+                ChatRoomId = chatRoom.Id
             };
+
+            await context.UserConnections.AddAsync(userConnection);
+            await context.SaveChangesAsync();
         }
 
         context.UserConnections.Add(userConn!);
