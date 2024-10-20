@@ -102,6 +102,9 @@ public class CreateOrderKoi
 
             await context.Orders.AddAsync(order, cancellationToken);
             CreatePaymentResult payOSUrl = await payOSServices.CreateOrderAsync((int)Math.Ceiling(order.Price), itemDatas);
+
+            order.PayOSOrderCode = payOSUrl.orderCode;
+
             if (payOSUrl.checkoutUrl is null)
                 return Result<Response>.Fail(new BadRequestException("Failed to create order."));
             await context.SaveChangesAsync(cancellationToken);
