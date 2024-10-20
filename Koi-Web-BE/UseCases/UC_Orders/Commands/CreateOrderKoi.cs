@@ -99,9 +99,12 @@ public class CreateOrderKoi
                     (int)Math.Ceiling(checkingFarmKois.First(fk => fk.Id == k.FarmKoiId).Koi.Price)
                 ))
                 .ToList();
-
-            await context.Orders.AddAsync(order, cancellationToken);
+            // Create PayOS Transactions
             CreatePaymentResult payOSUrl = await payOSServices.CreateOrderAsync((int)Math.Ceiling(order.Price), itemDatas);
+            // add to db
+            order.PayOSOrderCode = payOSUrl.orderCode;
+            await context.Orders.AddAsync(order, cancellationToken);
+
             if (payOSUrl.checkoutUrl is null)
                 return Result<Response>.Fail(new BadRequestException("Failed to create order."));
             await context.SaveChangesAsync(cancellationToken);
