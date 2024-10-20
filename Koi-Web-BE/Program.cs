@@ -97,6 +97,13 @@ app.UseOutputCache();
 app.UseMiddleware<AuthMiddleware>();
 app.UseMiddleware<ExceptionMiddleware>();
 app.MapHub<ChatHub>("/chat");
+var webSocketOptions = new WebSocketOptions
+{
+    KeepAliveInterval = TimeSpan.FromHours(1)
+};
+
+webSocketOptions.AllowedOrigins.Add("*");
+app.UseWebSockets(webSocketOptions);
 
 app.UseHttpsRedirection();
 
