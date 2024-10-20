@@ -48,6 +48,33 @@ public class AuthMiddleware(IApplicationDbContext appContext) : IMiddleware
         // then checking user is not null
         CurrentUser currentUser = context.RequestServices.GetRequiredService<CurrentUser>();
         currentUser.User = checkingUser;
+        //create user connection for chat between user and consulting
+        if (checkingUser.Role.Equals(RoleEnum.Customer))
+        {
+            //add user to chat
+            UserConnection userConnection = new()
+            {
+                UserId = checkingUser.Id,
+                ChatRoom = new ChatRoom
+                {
+                    RoomName = "Consulting chat - " + checkingUser.Username
+                },
+            };
+            //add consulting to chat
+            User? consulting = await appContext.Users
+                .AsNoTracking()
+                .FirstOrDefaultAsync(u => u.Role.Equals(RoleEnum.Consulting));
+            if (consulting is not null)
+            {
+                UserConnection consultConnection = new()
+                {
+                    UserId = consulting.Id,
+                    ChatRoomId = userConnection.ChatRoom.Id
+                };
+            }
+            appContext.UserConnections.Add(userConnection);
+            await appContext.SaveChangesAsync(cancellationToken: default);
+        }
         await next.Invoke(context);
     }
 }
