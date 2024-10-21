@@ -102,7 +102,7 @@ public class ChatHub(IApplicationDbContext context, CurrentUser currentUser) : H
         context.UserConnections.Add(userConn!);
         await context.SaveChangesAsync();
         //send message to the room
-        await Clients.Group(roomName).SendAsync("ReceiveMessage", "System", $"{Context.ConnectionId} has joined the room {roomName}");
+        await Clients.Group(roomName).SendAsync("JoinRoom", "System", $"{Context.ConnectionId} has joined the room {roomName}");
     }
 
     public async Task LeaveRoom(string roomName)
@@ -120,7 +120,7 @@ public class ChatHub(IApplicationDbContext context, CurrentUser currentUser) : H
             await context.SaveChangesAsync();
         }
         //send message to the room
-        await Clients.Group(roomName).SendAsync("ReceiveMessage", "System", $"{Context.ConnectionId} has left the room {roomName}");
+        await Clients.Group(roomName).SendAsync("LeaveRoom", "System", $"{Context.ConnectionId} has left the room {roomName}");
     }
 
     public async Task SendMessageToRoom(string roomName, string message)
@@ -139,6 +139,6 @@ public class ChatHub(IApplicationDbContext context, CurrentUser currentUser) : H
             ChatRoom = chatRoom,
             Content = message
         };
-        await Clients.Group(roomName).SendAsync("ReceiveMessage", currentUser.User!.Username, message);
+        await Clients.Group(roomName).SendAsync("SendMessageToRoom", currentUser.User!.Username, message);
     }
 }
