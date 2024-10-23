@@ -121,6 +121,8 @@ if (app.Environment.IsDevelopment())
 }
 else
 {
+    app.UseSwagger();
+    app.UseSwaggerUI(option => option.DisplayRequestDuration());
     app.MigrateDatabase<ApplicationDbContext>(async (_, _) => await Task.Delay(0));
 }
 app.UseCors();
