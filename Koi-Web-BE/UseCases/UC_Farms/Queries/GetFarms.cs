@@ -22,6 +22,13 @@ public class GetFarms
         string Name
     ) : IRequest<PaginatedList<FarmResponse>>;
 
+    public record KoiResponse(
+        Guid Id,
+        string Name,
+        int Quantity,
+        IEnumerable<string> ImageUrls
+    );
+
     public record ImageResponse(
         Guid Id,
         string Url
@@ -41,6 +48,7 @@ public class GetFarms
         string Address,
         string Description,
         decimal Rating,
+        IEnumerable<KoiResponse> Kois,
         IEnumerable<ImageResponse> FarmImages
     )
     {
@@ -53,7 +61,8 @@ public class GetFarms
                 Address: farm.Address,
                 Description: farm.Description,
                 Rating: farm.Rating,
-                FarmImages: farm.FarmImages.Select(i => ImageResponse.FromEntity(i))
+                Kois: farm.FarmKois.Select(farmKoi => new KoiResponse(farmKoi.Koi.Id, farmKoi.Koi.Name, farmKoi.Quantity, farmKoi.Koi.Images.Select(image => image.Url))),
+                FarmImages: farm.FarmImages.Select(ImageResponse.FromEntity)
             );
     }
 
@@ -64,6 +73,7 @@ public class GetFarms
             IQueryable<Farm> query = context.Farms
                 .AsNoTracking()
                 .Include(f => f.FarmImages)
+                .Include(f => f.FarmKois).ThenInclude(f => f.Koi).ThenInclude(f => f.Images)
                 .Where(f => f.Name.Trim().ToLower().Contains(request.Name.Trim().ToLower()));
 
             //sort
