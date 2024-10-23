@@ -8,6 +8,7 @@ public class OrderTrip : BaseEntity
 {
     public required Guid OrderId { get; set; }
     public required Guid TripId { get; set; }
+    public int Quantity { get; set; }
     public required DateTimeOffset StartDate { get; set; }
     public required DateTimeOffset EndDate { get; set; }
     public TripStatusEnum Status { get; set; } = TripStatusEnum.Pending;
