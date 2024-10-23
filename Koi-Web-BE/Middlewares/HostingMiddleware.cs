@@ -14,7 +14,7 @@ public static class HostingMiddleware
 
         try
         {
-            context.Database.EnsureDeleted();
+            // context.Database.EnsureDeleted();
             context?.Database.Migrate();
             seeder(context!, services).Wait();
         }
