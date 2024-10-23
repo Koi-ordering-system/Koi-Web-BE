@@ -34,10 +34,10 @@ public class UpdateKoisOfFarm
             if (checkingFarm is null) return Result<Response>.Fail(new NotFoundException("Farm not found."));
 
             // check kois exists
-            bool isKoisExist = await context.Kois
+            List<Koi> checkingKoiList = await context.Kois
                 .AsNoTracking()
-                .AllAsync(k => request.Kois.Select(r => r.Id).Contains(k.Id), cancellationToken);
-            if (!isKoisExist) return Result<Response>.Fail(new NotFoundException("Kois not found."));
+                .Where(k => request.Kois.Select(r => r.Id).Contains(k.Id)).ToListAsync(cancellationToken);
+            if (checkingKoiList.Count != request.Kois.Length) return Result<Response>.Fail(new NotFoundException("Some Kois not found."));
             // delete all farm kois that are exists
             await context.FarmKois.Where(fk => fk.FarmId == request.Id)
                 .ExecuteDeleteAsync(cancellationToken);

@@ -24,7 +24,17 @@ public class UpdateFarm
         IFormFileCollection FarmImages
     ) : IRequest<Result<Response>>;
 
-    public record Response();
+    public record Response(
+        Guid Id,
+        string Name
+    )
+    {
+        public static Response FromEntity(Farm farm)
+            => new(
+                Id: farm.Id,
+                Name: farm.Name
+            );
+    };
 
     public class Handler(IApplicationDbContext context, CurrentUser currentUser, IImageService imageService, IOutputCacheStore store) : IRequestHandler<Command, Result<Response>>
     {
@@ -56,7 +66,7 @@ public class UpdateFarm
             await context.SaveChangesAsync(cancellationToken);
             // clear cache
             await store.EvictByTagAsync("Farms", cancellationToken);
-            return Result<Response>.Succeed(null!);
+            return Result<Response>.Succeed(Response.FromEntity(updatingFarm));
         }
     }
 
@@ -84,7 +94,7 @@ public class UpdateFarm
             Result<Response> result = await sender.Send(new Command(id, name, owner, address, description, farmImages), cancellationToken);
             if (!result.Succeeded)
                 return Results.BadRequest(result);
-            return Results.NoContent();
+            return Results.Ok(result);
         }
     }
 
