@@ -49,6 +49,14 @@ public class UpdateFarm
                 .SingleOrDefaultAsync(f => f.Id == request.Id, cancellationToken);
             if (updatingFarm == null)
                 return Result<Response>.Fail(new NotFoundException("Farm not found"));
+            // Remove farm images in database
+            context.FarmImages.RemoveRange(updatingFarm.FarmImages.ToList());
+            // Remove farm images in cloudinary
+            var deleteTasks = updatingFarm.FarmImages
+                .Select(farmImage => imageService.DeleteImageAsync(farmImage.Url)).ToList();
+            await Task.WhenAll(deleteTasks);
+            if (deleteTasks.Any(task => !task.Result))
+                throw new InvalidOperationException("Failed to delete images from Cloudinary");
             // Update the farm entity
             updatingFarm.Update(request.Name, request.Owner, request.Address, request.Description);
             // Upload images to Cloudinary and add URLs to the farm
