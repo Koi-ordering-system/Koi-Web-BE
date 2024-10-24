@@ -139,6 +139,8 @@ public class ChatHub(IApplicationDbContext context, CurrentUser currentUser) : H
             ChatRoom = chatRoom,
             Content = message
         };
+        await context.ChatMessages.AddAsync(chatMessage);
+        await context.SaveChangesAsync();
         await Clients.Group(roomName).SendAsync("SendMessageToRoom", "System", message);
     }
 }
