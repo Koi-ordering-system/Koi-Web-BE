@@ -17,10 +17,10 @@ public class GetServiceOrders
     ) : IRequest<Result<Response>>;
 
     public record Response(
-        int PageIndex,
-        int PageSize,
+        int PageNumber,
+        int TotalCount,
         int TotalPages,
-        IEnumerable<OrderDetailResponse> Orders
+        IEnumerable<OrderDetailResponse> Items
     );
 
     public record OrderDetailResponse(
@@ -105,10 +105,10 @@ public class GetServiceOrders
                                                                 .Select(o => OrderDetailResponse.FromEntity(o))
                                                                 .ToListAsync(cancellationToken);
             return Result<Response>.Succeed(new(
-                PageIndex: request.PageIndex,
-                PageSize: request.PageSize,
+                PageNumber: request.PageIndex,
+                TotalCount: count,
                 TotalPages: (int)Math.Ceiling((double)count / request.PageSize),
-                Orders: orders
+                Items: orders
             ));
         }
     }

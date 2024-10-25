@@ -16,7 +16,7 @@ public class GetPersonalOrders
     ) : IRequest<Result<Response>>;
 
     public record Response(
-        IEnumerable<OrderDetailResponse> Orders,
+        IEnumerable<OrderDetailResponse> Items,
         int PageNumber,
         int TotalCount,
         int TotalPages
@@ -115,7 +115,7 @@ public class GetPersonalOrders
                 .Select(o => OrderDetailResponse.FromEntity(o))
                 .ToListAsync(cancellationToken);
             return Result<Response>.Succeed(new Response(
-                Orders: orders,
+                Items: orders,
                 TotalCount: count,
                 PageNumber: request.PageIndex,
                 TotalPages: (int)Math.Ceiling((double)count / request.PageSize)
