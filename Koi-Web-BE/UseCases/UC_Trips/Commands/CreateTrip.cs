@@ -50,8 +50,8 @@ public class CreateTrip
         public static async Task<IResult> Handle(ISender sender, [FromBody] CreateTripRequest request, CancellationToken cancellationToken)
         {
             Result<Response> result = await sender.Send(new Command(request.farmId, request.days, request.price), cancellationToken);
-            if (!result.Succeeded) return Results.BadRequest(result);
-            return Results.Created(result.Message, result);
+            if (!result.Succeeded) return TypedResults.BadRequest(result);
+            return TypedResults.Created(result.Message, result);
         }
     }
 }

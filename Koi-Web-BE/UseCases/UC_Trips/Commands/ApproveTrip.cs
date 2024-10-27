@@ -8,9 +8,9 @@ using Swashbuckle.AspNetCore.Annotations;
 
 namespace Koi_Web_BE.UseCases.UC_Trips.Commands;
 
-public class DeleteTrip
+public class ApproveTrip
 {
-    public record DeleteTripRequest(
+    public record DenyTripRequest(
         Guid id
     );
     public record Command(
@@ -25,7 +25,7 @@ public class DeleteTrip
         {
             int result = await context.Trips
                 .Where(t => t.Id.Equals(request.Id))
-                .ExecuteDeleteAsync(cancellationToken);
+                .ExecuteUpdateAsync(e => e.SetProperty(t => t.IsApproved, true), cancellationToken);
             if (result == 0) return Result<Response>.Fail(new NotFoundException("Trip not found."));
             return Result<Response>.Succeed(null!);
         }
@@ -35,13 +35,13 @@ public class DeleteTrip
     {
         public static void DefineEndpoints(IEndpointRouteBuilder app)
         {
-            app.MapDelete("api/trips/{id:guid}", Handle)
+            app.MapPatch("api/trips/{id:guid}/approve", Handle)
                 .WithTags("Trips")
-                .WithMetadata(new SwaggerOperationAttribute("Delete a Trip"))
+                .WithMetadata(new SwaggerOperationAttribute("Approve a Trip"))
                 .RequireAuthorization();
         }
 
-        public async static Task<IResult> Handle([AsParameters] DeleteTripRequest request, ISender sender)
+        public async static Task<IResult> Handle([AsParameters] DenyTripRequest request, ISender sender)
         {
             Result<Response> response = await sender.Send(new Command(request.id), default);
             if (!response.Succeeded) return TypedResults.BadRequest(response);

@@ -45,7 +45,7 @@ public class UpdateTrip
         {
             app.MapPut("api/trips/{id:guid}", Handle)
                 .WithTags("Trips")
-                .WithMetadata(new SwaggerOperationAttribute("Deny a Trip"))
+                .WithMetadata(new SwaggerOperationAttribute("Update a Trip"))
                 .RequireAuthorization();
         }
 
