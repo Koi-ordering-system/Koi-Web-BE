@@ -35,7 +35,7 @@ public class DenyTrip
     {
         public static void DefineEndpoints(IEndpointRouteBuilder app)
         {
-            app.MapPatch("api/trips/{id:guid}", Handle)
+            app.MapPatch("api/trips/{id:guid}/deny", Handle)
                 .WithTags("Trips")
                 .WithMetadata(new SwaggerOperationAttribute("Deny a Trip"))
                 .RequireAuthorization();
@@ -44,8 +44,8 @@ public class DenyTrip
         public async static Task<IResult> Handle([AsParameters] DenyTripRequest request, ISender sender)
         {
             Result<Response> response = await sender.Send(new Command(request.id), default);
-            if (!response.Succeeded) return Results.BadRequest(response);
-            return Results.NoContent();
+            if (!response.Succeeded) return TypedResults.BadRequest(response);
+            return TypedResults.NoContent();
         }
     }
 }
