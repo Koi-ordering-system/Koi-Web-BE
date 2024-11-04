@@ -54,9 +54,9 @@ public abstract class GetKois
                 query = query.Where(x => EF.Functions.ILike(x.Name, $"%{request.Search}%"));
             }
 
-            if(request.Id is not null)
+            if (request.Id is not null)
             {
-                query = query.Where(x => x.Id == request.Id);
+                query = query.Where(x => x.FarmKois.Any(f => f.Id == request.Id));
             }
 
             Expression<Func<Koi, object>> keySelector = x => x.Name;
