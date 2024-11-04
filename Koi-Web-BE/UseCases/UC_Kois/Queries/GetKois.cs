@@ -56,7 +56,7 @@ public abstract class GetKois
 
             if (request.Id is not null)
             {
-                query = query.Where(x => x.FarmKois.Any(f => f.Id == request.Id));
+                query = query.Where(x => x.FarmKois.Any(f => f.FarmId == request.Id));
             }
 
             Expression<Func<Koi, object>> keySelector = x => x.Name;
