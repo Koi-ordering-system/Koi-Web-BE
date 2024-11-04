@@ -16,13 +16,15 @@ public abstract class GetKois
     public record Query(
         int Page,
         int Size,
-        string Search
+        string Search,
+        Guid? Id
     ) : IRequest<PaginatedList<ResponseItem>>;
 
     public record GetKoisRequest(
         int pageIndex = 1,
         int pageSize = 10,
-        string keyword = ""
+        string keyword = "",
+        Guid? id = null!
     );
 
     public class ResponseItem
@@ -50,6 +52,11 @@ public abstract class GetKois
             if (!string.IsNullOrEmpty(request.Search))
             {
                 query = query.Where(x => EF.Functions.ILike(x.Name, $"%{request.Search}%"));
+            }
+
+            if(request.Id is not null)
+            {
+                query = query.Where(x => x.Id == request.Id);
             }
 
             Expression<Func<Koi, object>> keySelector = x => x.Name;
@@ -89,7 +96,8 @@ public abstract class GetKois
             var response = await sender.Send(new Query(
                 request.pageIndex,
                 request.pageSize,
-                request.keyword
+                request.keyword,
+                request.id
             ), default);
             return Results.Ok(Result<PaginatedList<ResponseItem>>.Succeed(response));
         }
