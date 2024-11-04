@@ -70,7 +70,7 @@ public class GetUsers
             app.MapGet("/api/users", async (ISender sender, int pageIndex = 1, int pageSize = 10) =>
             {
                 Result<PaginatedList<Response>> response = await sender.Send(new Query(pageIndex, pageSize), default);
-                return TypedResults.Ok(response);
+                return TypedResults.Ok(response);   
             })
                 .WithTags("Users")
                 .WithMetadata(new SwaggerOperationAttribute("Get all Users"))
