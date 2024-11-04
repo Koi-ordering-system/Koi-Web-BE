@@ -53,7 +53,9 @@ public abstract class CreateKoi
                 };
             });
             var koiImages = await Task.WhenAll(uploadTasks);
-            ((List<KoiImage>)koi.Images).AddRange(koiImages);
+            // ((List<KoiImage>)koi.Images).AddRange(koiImages);
+
+            dbContext.KoiImages.AddRange(koiImages);
 
             await dbContext.SaveChangesAsync(cancellationToken);
             await store.EvictByTagAsync("Kois", cancellationToken);
