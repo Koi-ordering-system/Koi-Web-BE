@@ -33,7 +33,8 @@ public class GetUnapprovedTrips
         Guid FarmId,
         string FarmName,
         int Days,
-        decimal Price
+        decimal Price,
+        string[] Images
     )
     {
         public static Response FromEntity(Trip trip) => new(
@@ -41,7 +42,8 @@ public class GetUnapprovedTrips
             FarmId: trip.FarmId,
             FarmName: trip.Farm?.Name ?? string.Empty,
             Days: trip.Days,
-            Price: trip.Price
+            Price: trip.Price,
+            Images: trip.Farm?.FarmImages.Select(i => i.Url).ToArray() ?? []
         );
     };
 
@@ -54,7 +56,7 @@ public class GetUnapprovedTrips
 
             IQueryable<Trip> query = context.Trips
                 .AsNoTracking()
-                .Include(o => o.Farm)
+                .Include(o => o.Farm).ThenInclude(f => f.FarmImages)
                 .Where(o => o.IsApproved == null);
             int total = await query.CountAsync(cancellationToken);
             IEnumerable<Response> gettingTrips = await query
