@@ -1,13 +1,11 @@
 using Koi_Web_BE.Database;
 using Koi_Web_BE.Endpoints.Internal;
-using Koi_Web_BE.Exceptions;
 using Koi_Web_BE.Models;
 using Koi_Web_BE.Models.Entities;
 using Koi_Web_BE.Models.Primitives;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Swashbuckle.AspNetCore.Annotations;
-using static Koi_Web_BE.UseCases.Test.Queries.Test;
 
 namespace Koi_Web_BE.UseCases.UC_Users.Queries;
 
