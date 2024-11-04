@@ -42,12 +42,10 @@ public class GetUsers
         );
     };
 
-    public class Handler(IApplicationDbContext context, CurrentUser currentUser) : IRequestHandler<Query, Result<PaginatedList<Response>>>
+    public class Handler(IApplicationDbContext context) : IRequestHandler<Query, Result<PaginatedList<Response>>>
     {
         public async Task<Result<PaginatedList<Response>>> Handle(Query request, CancellationToken cancellationToken)
         {
-            if (!currentUser.User!.IsAdmin()) return Result<PaginatedList<Response>>.Fail(new ForbiddenException("Unauthorized."));
-
             IQueryable<User> query = context.Users
                 .AsNoTracking();
             int total = await query.CountAsync(cancellationToken);
@@ -72,6 +70,7 @@ public class GetUsers
             app.MapGet("/api/users", async (ISender sender, int pageIndex = 1, int pageSize = 10) =>
             {
                 Result<PaginatedList<Response>> response = await sender.Send(new Query(pageIndex, pageSize), default);
+                return TypedResults.Ok(response);
             })
                 .WithTags("Users")
                 .WithMetadata(new SwaggerOperationAttribute("Get all Users"))
