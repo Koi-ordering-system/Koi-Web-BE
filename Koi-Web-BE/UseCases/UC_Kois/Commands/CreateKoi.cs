@@ -1,6 +1,5 @@
 using Koi_Web_BE.Database;
 using Koi_Web_BE.Endpoints.Internal;
-using Koi_Web_BE.Extensions;
 using Koi_Web_BE.Models.Entities;
 using Koi_Web_BE.Utils;
 using MediatR;
@@ -53,9 +52,9 @@ public abstract class CreateKoi
                 };
             });
             var koiImages = await Task.WhenAll(uploadTasks);
-            // ((List<KoiImage>)koi.Images).AddRange(koiImages);
+            ((List<KoiImage>)koi.Images).AddRange(koiImages);
 
-            dbContext.KoiImages.AddRange(koiImages);
+            // dbContext.KoiImages.AddRange(koiImages);
 
             await dbContext.SaveChangesAsync(cancellationToken);
             await store.EvictByTagAsync("Kois", cancellationToken);
@@ -91,6 +90,7 @@ public abstract class CreateKoi
                 Price = price,
                 MaxSize = maxSize,
                 MinSize = minSize,
+                KoiImages = koiImages,
                 Colors = colors.Split(','),
             }, cancellationToken);
             return Results.Created();
