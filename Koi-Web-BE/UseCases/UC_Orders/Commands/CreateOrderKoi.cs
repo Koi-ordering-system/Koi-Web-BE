@@ -27,7 +27,7 @@ public class CreateOrderKoi
     ) : IRequest<Result<Response>>;
 
     public record KoiDetails(
-        Guid FarmKoiId,
+        Guid KoiId,
         int Quantity,
         Guid? Color,
         decimal? MinSize,
@@ -60,7 +60,8 @@ public class CreateOrderKoi
             IEnumerable<CheckingFarmDbResponse> checkingFarmKois = await context.FarmKois
                 .AsNoTracking()
                 .Include(fk => fk.Koi)
-                .Where(fk => request.Kois.Select(k => k.FarmKoiId).Contains(fk.Id))
+                .Where(fk => request.Kois.Select(k => k.KoiId).Contains(fk.KoiId))
+                .Where(fk => fk.FarmId == request.FarmId)
                 .Select(c => CheckingFarmDbResponse.From(c))
                 .ToListAsync(cancellationToken);
 
@@ -69,7 +70,7 @@ public class CreateOrderKoi
 
             foreach (KoiDetails koi in request.Kois)
             {
-                CheckingFarmDbResponse? farmKoi = checkingFarmKois.FirstOrDefault(fk => fk.Id == koi.FarmKoiId);
+                CheckingFarmDbResponse? farmKoi = checkingFarmKois.FirstOrDefault(fk => fk.Koi.Id == koi.KoiId);
                 if (farmKoi is null)
                     return Result<Response>.Fail(new NotFoundException("Some Kois not found."));
 
@@ -87,16 +88,16 @@ public class CreateOrderKoi
             {
                 UserId = request.UserId,
                 FarmId = request.FarmId,
-                Price = request.Kois.Sum(k => k.Quantity * checkingFarmKois.First(fk => fk.Id == k.FarmKoiId).Koi.Price),
+                Price = request.Kois.Sum(k => k.Quantity * checkingFarmKois.First(fk => fk.Koi.Id == k.KoiId).Koi.Price),
                 PrePaidPrice = request.PrePaidPrice ?? 0,
                 IsPaid = false
             };
 
             List<ItemData> itemDatas = request.Kois
                 .Select(k => new ItemData(
-                    checkingFarmKois.First(fk => fk.Id == k.FarmKoiId).Koi.Name,
+                    checkingFarmKois.First(fk => fk.Koi.Id == k.KoiId).Koi.Name,
                     k.Quantity,
-                    (int)Math.Ceiling(checkingFarmKois.First(fk => fk.Id == k.FarmKoiId).Koi.Price)
+                    (int)Math.Ceiling(checkingFarmKois.First(fk => fk.Koi.Id == k.KoiId).Koi.Price)
                 ))
                 .ToList();
             // Create PayOS Transactions
