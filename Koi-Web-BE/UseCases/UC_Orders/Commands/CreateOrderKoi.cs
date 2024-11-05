@@ -78,7 +78,7 @@ public class CreateOrderKoi
                     return Result<Response>.Fail(new BadRequestException("MinSize must be less than MaxSize."));
 
                 if (koi.MinSize is not null && farmKoi.MinSize > koi.MinSize)
-                    return Result<Response>.Fail(new BadRequestException("MinSize must be less than MaxSize."));
+                    return Result<Response>.Fail(new BadRequestException("Requesting MinSize is too small comparing to farmKoi Min size."));
 
                 if (koi.MaxSize is not null && farmKoi.MaxSize < koi.MaxSize)
                     return Result<Response>.Fail(new BadRequestException("MaxSize must be greater than MinSize."));
