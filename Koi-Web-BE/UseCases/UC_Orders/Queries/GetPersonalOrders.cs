@@ -107,7 +107,8 @@ public class GetPersonalOrders
                 .Include(o => o.Farm)
                 .Include(o => o.OrderKois).ThenInclude(ok => ok.Koi)
                 .Include(o => o.OrderTrip).ThenInclude(o => o.Trip)
-                .Where(o => o.UserId.Equals(currentUser.User!.Id ?? null));
+                .Where(o => o.UserId.Equals(currentUser.User!.Id ?? null))
+                .Where(o => o.IsPaid);
             int count = await query.CountAsync(cancellationToken);
             IEnumerable<OrderDetailResponse> orders = await query
                 .Skip((request.PageIndex - 1) * request.PageSize)
