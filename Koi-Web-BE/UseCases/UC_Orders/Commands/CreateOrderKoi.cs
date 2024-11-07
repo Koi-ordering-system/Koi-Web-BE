@@ -56,7 +56,7 @@ public class CreateOrderKoi
     ) : IRequestHandler<Command, Result<Response>>
     {
         public async Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)
-        {m
+        {
             IEnumerable<CheckingFarmDbResponse> checkingFarmKois = await context.FarmKois
                 .AsNoTracking()
                 .Include(fk => fk.Koi)
