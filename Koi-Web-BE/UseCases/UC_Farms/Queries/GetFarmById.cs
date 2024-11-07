@@ -22,7 +22,7 @@ public class GetFarmById
         string Address,
         string Description,
         decimal Rating,
-        IEnumerable<string> FarmImages,
+        IEnumerable<FarmImageResponse> FarmImages,
         IEnumerable<KoiResponse> Kois,
         IEnumerable<TripResponse> Trips
     )
@@ -34,11 +34,13 @@ public class GetFarmById
                 Address: farm.Address,
                 Description: farm.Description,
                 Rating: farm.Rating,
-                FarmImages: farm.FarmImages.Select(farmImage => farmImage.Url),
+                FarmImages: farm.FarmImages.Select(farmImage => new FarmImageResponse(farmImage.Id, farmImage.Url)),
                 Kois: farm.FarmKois.Select(farmKoi => new KoiResponse(farmKoi.Koi.Id, farmKoi.Koi.Name, farmKoi.Quantity, farmKoi.Koi.Images.Select(image => image.Url))),
                 Trips: farm.Trips.Select(trip => new TripResponse(trip.Id, trip.Farm.Id, trip.Farm.Name, trip.Days, trip.Price))
             );
     }
+
+    public record FarmImageResponse(Guid Id, string Url);
 
     public record KoiResponse(
         Guid Id,
