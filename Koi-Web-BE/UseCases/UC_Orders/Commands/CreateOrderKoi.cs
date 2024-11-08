@@ -84,13 +84,23 @@ public class CreateOrderKoi
                     return Result<Response>.Fail(new BadRequestException("MaxSize must be greater than MinSize."));
             }
 
+            Guid orderId = Guid.NewGuid();
             Order order = new()
             {
+                Id = orderId,
                 UserId = request.UserId,
                 FarmId = request.FarmId,
                 Price = request.Kois.Sum(k => k.Quantity * checkingFarmKois.First(fk => fk.Koi.Id == k.KoiId).Koi.Price),
                 PrePaidPrice = request.PrePaidPrice ?? 0,
-                IsPaid = false
+                IsPaid = false,
+                OrderKois = request.Kois.Select(k => new OrderKoi
+                {
+                    OrderId = orderId,
+                    KoiId = k.KoiId,
+                    Quantity = k.Quantity,
+                    ColorId = k.Color!.Value,
+                    Size = k.MinSize!.Value
+                }).ToArray()
             };
 
             List<ItemData> itemDatas = request.Kois
